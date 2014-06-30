@@ -12,6 +12,7 @@ public abstract class AbstractConfig {
 	
 	private final Properties props;
 	private final Path filePath;
+	private boolean loadOnGet = false;
 	
 	public AbstractConfig(String documentsFolder){
 		this(documentsFolder, "config.properties");
@@ -26,16 +27,12 @@ public abstract class AbstractConfig {
 	
 	public AbstractConfig(Path filePath){
 		props = new Properties();
-		
 		this.filePath = filePath;
-		
-		try(FileInputStream is = new FileInputStream(filePath.toFile())){
-			props.load(is);
-		} catch (FileNotFoundException ex){
-			save();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		load();
+	}
+	
+	protected void setLoadOnGet(boolean loadOnGet){
+		this.loadOnGet = loadOnGet;
 	}
 	
 	protected void setProperty(String key, String value){
@@ -44,11 +41,27 @@ public abstract class AbstractConfig {
 	}
 	
 	protected String getProperty(String key){
+		if (loadOnGet){
+			load();
+		}
 		return props.getProperty(key);
 	}
 	
 	protected boolean hasProperty(String key){
+		if (loadOnGet){
+			load();
+		}
 		return props.containsKey(key);
+	}
+	
+	protected void load(){
+		try(FileInputStream is = new FileInputStream(filePath.toFile())){
+			props.load(is);
+		} catch (FileNotFoundException ex){
+			save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected void save(){
