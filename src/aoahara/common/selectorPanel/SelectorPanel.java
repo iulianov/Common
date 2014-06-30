@@ -60,6 +60,7 @@ public class SelectorPanel<T> extends JSplitPane
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!arg0.getValueIsAdjusting()){
 			view.display(list.getSelectedValue());
+			view.updateUI();
 		}
 	}
 	
@@ -75,15 +76,23 @@ public class SelectorPanel<T> extends JSplitPane
 		@Override
 		public void run() {
 			synchronized(list){
+				DefaultListModel<T> model = (DefaultListModel<T>) list.getModel();
+				
 				T selected = list.getSelectedValue();
 				
-				DefaultListModel<T> model = (DefaultListModel<T>) list.getModel();
-				model.removeAllElements();
-				for (T ele : elements){
-					model.addElement(ele);
+				if (model.getSize() != elements.size()){
+					model.removeAllElements();
+					for (T ele : elements){
+						model.addElement(ele);
+					}
+					
+					if (selected == null && !elements.isEmpty()){
+						selectIndex(0);
+					} else {
+						selectElement(selected);
+					}
+
 				}
-				
-				selectElement(selected);
 			}
 		}
 	}

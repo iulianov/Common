@@ -5,6 +5,11 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public abstract class SelectorView<T> extends JPanel {
 	
+	public SelectorView(){
+		super(true);
+	}
+	
 	public abstract void display(T element);
+	public abstract T getElement();
 
 }
