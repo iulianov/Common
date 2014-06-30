@@ -1,5 +1,6 @@
 package aoahara.common.selectorPanel;
 
+import java.awt.Dimension;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -27,6 +28,7 @@ public class SelectorPanel<T> extends JSplitPane
 
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(this);
+		list.setPreferredSize(new Dimension(150, 800));
 		
 		setVisible(true);
 		
