@@ -2,6 +2,8 @@ package aoahara.common.selectorPanel;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -27,7 +29,10 @@ public class SelectorPanel<T> extends JSplitPane
 		list.addListSelectionListener(this);
 		
 		setVisible(true);
-		new DataMonitor().start();;
+		
+		// Start Update Timer
+		Timer timer = new Timer(true);
+		timer.scheduleAtFixedRate(new UpdateTask(), 0, 1000);
 	}
 	
 	@Override
@@ -63,31 +68,20 @@ public class SelectorPanel<T> extends JSplitPane
 		}
 	}
 	
-	private class DataMonitor extends Thread {
-		
+	private class UpdateTask extends TimerTask {
+
 		@Override
-		public void run(){
-			while(true){
+		public void run() {
+			synchronized(list){
+				T selected = list.getSelectedValue();
 				
-				// Update Model
-				synchronized(list){
-					T selected = list.getSelectedValue();
-					
-					DefaultListModel<T> model = (DefaultListModel<T>) list.getModel();
-					model.removeAllElements();
-					for (T ele : elements){
-						model.addElement(ele);
-					}
-					
-					selectElement(selected);
+				DefaultListModel<T> model = (DefaultListModel<T>) list.getModel();
+				model.removeAllElements();
+				for (T ele : elements){
+					model.addElement(ele);
 				}
 				
-				// Sleep
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// Do Nothing
-				}
+				selectElement(selected);
 			}
 		}
 	}
