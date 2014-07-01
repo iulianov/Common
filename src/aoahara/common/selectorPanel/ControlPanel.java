@@ -8,9 +8,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class ControlPanel implements SelectorBasePanel {
+public class ControlPanel<T> implements SelectorView<T> {
 	
-	private final JPanel panel;
+	protected final JPanel panel;
+	protected T element;
 
 	public ControlPanel(){
 		panel = new JPanel();
@@ -31,6 +32,16 @@ public class ControlPanel implements SelectorBasePanel {
 	
 	public JComponent getComponent(){
 		return panel;
+	}
+
+	@Override
+	public void display(T element) {
+		this.element = element;
+	}
+
+	@Override
+	public T getElement() {
+		return element;
 	}
 
 }

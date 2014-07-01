@@ -2,6 +2,7 @@ package aoahara.common.selectorPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -14,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -25,11 +27,11 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	private final JSplitPane splitPane = new SelectorSplitPane();
 	private final JList<T> list = new JList<T>(new DefaultListModel<T>());
 	private Collection<T> elements = new LinkedList<>();
-	private final SelectorView<T> view;
+	private final Collection<SelectorView<T>> views = new ArrayList<>(); 
 	private JScrollPane scrollPane;
 
 	public SelectorPanel(SelectorView<T> view){
-		this.view = view;
+		views.add(view);
 		
 		// Configure List
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -56,9 +58,10 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 		return sidePanel;
 	}
 	
-	public JComponent addControlPanel(boolean left, ControlPanel controlPanel){
+	public JComponent addControlPanel(boolean left, ControlPanel<T> controlPanel){
 		JPanel sidePanel = (JPanel) (left ? splitPane.getLeftComponent() : splitPane.getRightComponent());
-		sidePanel.add(controlPanel.getComponent(), BorderLayout.SOUTH);		
+		sidePanel.add(controlPanel.getComponent(), BorderLayout.SOUTH);
+		views.add(controlPanel);
 		return sidePanel;
 	}
 	
@@ -80,12 +83,20 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 		list.setSelectedIndex(index);
 		return list.getSelectedValue();
 	}
+	
+	public void setListCellRenderer(ListCellRenderer <T> renderer){
+		list.setCellRenderer(renderer);
+	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!arg0.getValueIsAdjusting()){
-			view.display(list.getSelectedValue());
-			view.getComponent().updateUI();
+			
+			for (SelectorView<T> view : views){
+				view.display(list.getSelectedValue());
+				view.getComponent().updateUI();
+			}
+			
 			
 			// Reset right scroll bar to top
 			SwingUtilities.invokeLater(new Runnable(){
