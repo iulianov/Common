@@ -11,9 +11,11 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -24,6 +26,7 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	private final JList<T> list = new JList<T>(new DefaultListModel<T>());
 	private Collection<T> elements = new LinkedList<>();
 	private final SelectorView<T> view;
+	private JScrollPane scrollPane;
 
 	public SelectorPanel(SelectorView<T> view){
 		this.view = view;
@@ -42,7 +45,7 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	}
 	
 	private JPanel createSidePanel(JComponent comp, Dimension preferredSize){
-		JScrollPane scrollPane = new JScrollPane(comp);
+		scrollPane = new JScrollPane(comp);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(10);
 		
@@ -83,6 +86,15 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 		if (!arg0.getValueIsAdjusting()){
 			view.display(list.getSelectedValue());
 			view.getComponent().updateUI();
+			
+			// Reset right scroll bar to top
+			SwingUtilities.invokeLater(new Runnable(){
+				@Override
+				public void run() {
+					JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+					scrollBar.setValue(scrollBar.getMinimum());
+				}
+			});
 		}
 	}
 	
