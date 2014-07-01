@@ -11,6 +11,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -21,41 +22,41 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	
 	private final JSplitPane splitPane = new SelectorSplitPane();
 	private final JList<T> list = new JList<T>(new DefaultListModel<T>());
-	private final SelectorView<T> view;
 	private Collection<T> elements = new LinkedList<>();
+	private final SelectorView<T> view;
 
 	public SelectorPanel(SelectorView<T> view){
 		this.view = view;
 		
-		// Create Side Panels
-		splitPane.setLeftComponent(new JPanel(new BorderLayout()));
-		splitPane.setRightComponent(new JPanel(new BorderLayout()));
-		
-		// Add Main Components to Side Panels
-		addComponent(true, BorderLayout.CENTER, list);
-		addComponent(false, BorderLayout.CENTER, view.getComponent());
-		
-		splitPane.setContinuousLayout(true);
-
+		// Configure List
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(this);
-		list.setPreferredSize(new Dimension(150, 800));
 		
-		splitPane.setVisible(true);
+		// Add Componenents to JSplitPane
+		splitPane.setLeftComponent(createSidePanel(list, new Dimension(150, 800)));
+		splitPane.setRightComponent(createSidePanel(view.getComponent(), null));
 		
-		// Start Update Timer
+		// Start List Model Update Timer
 		Timer timer = new Timer(true);
 		timer.scheduleAtFixedRate(new UpdateTask(), 0, 1000);
 	}
 	
-	private JComponent addComponent(boolean left, Object cons, JComponent comp){
-		JPanel panel = (JPanel) (left ? splitPane.getLeftComponent() : splitPane.getRightComponent());
-		panel.add(comp, cons);		
-		return comp;
+	private JPanel createSidePanel(JComponent comp, Dimension preferredSize){
+		JScrollPane scrollPane = new JScrollPane(comp);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+		
+		JPanel sidePanel = new JPanel(new BorderLayout());
+		sidePanel.setPreferredSize(preferredSize);
+		sidePanel.add(scrollPane, BorderLayout.CENTER);
+		
+		return sidePanel;
 	}
 	
-	public JComponent addControlPanel(boolean left, ControlPanel panel){
-		return addComponent(left, BorderLayout.SOUTH, panel.getComponent());
+	public JComponent addControlPanel(boolean left, ControlPanel controlPanel){
+		JPanel sidePanel = (JPanel) (left ? splitPane.getLeftComponent() : splitPane.getRightComponent());
+		sidePanel.add(controlPanel.getComponent(), BorderLayout.SOUTH);		
+		return sidePanel;
 	}
 	
 	@Override
@@ -81,6 +82,7 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!arg0.getValueIsAdjusting()){
 			view.display(list.getSelectedValue());
+			view.getComponent().updateUI();
 		}
 	}
 	
@@ -91,6 +93,11 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	// -- Internal Components -----------------------------------------
 	
 	private class SelectorSplitPane extends JSplitPane {
+		
+		public SelectorSplitPane(){
+			setContinuousLayout(true);
+		}
+		
 		@Override
 		public void paintComponent(java.awt.Graphics g){
 			/**Overridden to prevent view update during model update **/
