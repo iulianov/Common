@@ -2,6 +2,8 @@ package aoahara.common.selectorPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -21,21 +23,26 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import aoahara.common.Listenable;
+
 @SuppressWarnings("serial")
-public class SelectorPanel<T> implements ListSelectionListener, SelectorListener<T>, SelectorBasePanel {
+public class SelectorPanel<T> extends Listenable<ElementClickListener<T>>
+		implements MouseListener, ListSelectionListener, SelectorListener<T>,
+		DecoratedComponent<JComponent> {
 	
 	private final JSplitPane splitPane = new SelectorSplitPane();
 	private final JList<T> list = new JList<T>(new DefaultListModel<T>());
 	private Collection<T> elements = new LinkedList<>();
-	private final Collection<SelectorView<T>> views = new ArrayList<>(); 
+	private final Collection<SelectorView<T, JPanel>> views = new ArrayList<>(); 
 	private JScrollPane scrollPane;
 
-	public SelectorPanel(SelectorView<T> view){
+	public SelectorPanel(SelectorView<T, JPanel> view){
 		views.add(view);
 		
 		// Configure List
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.addListSelectionListener(this);
+		list.addMouseListener(this);
 		
 		// Add Componenents to JSplitPane
 		splitPane.setLeftComponent(createSidePanel(list, new Dimension(150, 800)));
@@ -87,12 +94,19 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 	public void setListCellRenderer(ListCellRenderer <T> renderer){
 		list.setCellRenderer(renderer);
 	}
+	
+	@Override
+	public JComponent getComponent(){
+		return splitPane;
+	}
+	
+	// -- Listeners ---------------------------------------------------
 
 	@Override
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!arg0.getValueIsAdjusting()){
 			
-			for (SelectorView<T> view : views){
+			for (SelectorView<T, JPanel> view : views){
 				view.display(list.getSelectedValue());
 				view.getComponent().updateUI();
 			}
@@ -109,9 +123,21 @@ public class SelectorPanel<T> implements ListSelectionListener, SelectorListener
 		}
 	}
 	
-	public JComponent getComponent(){
-		return splitPane;
-	}
+	@Override
+	public void mouseClicked(MouseEvent evt) {
+        for (ElementClickListener<T> l : getListeners()){
+        	l.elementClicked(list.getSelectedValue(), evt.getClickCount());
+        }
+    }
+	
+	@Override
+	public void mousePressed(MouseEvent e) { /* N/A */}
+	@Override
+	public void mouseReleased(MouseEvent e) { /* N/A */ }
+	@Override
+	public void mouseEntered(MouseEvent e) { /* N/A */ }
+	@Override
+	public void mouseExited(MouseEvent e) { /* N/A */ }
 	
 	// -- Internal Components -----------------------------------------
 	

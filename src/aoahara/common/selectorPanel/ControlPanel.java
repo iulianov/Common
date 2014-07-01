@@ -5,10 +5,9 @@ import java.awt.FlowLayout;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-public class ControlPanel<T> implements SelectorView<T> {
+public class ControlPanel<T> implements SelectorView<T, JPanel> {
 	
 	protected final JPanel panel;
 	protected T element;
@@ -30,7 +29,7 @@ public class ControlPanel<T> implements SelectorView<T> {
 		return button;
 	}
 	
-	public JComponent getComponent(){
+	public JPanel getComponent(){
 		return panel;
 	}
 

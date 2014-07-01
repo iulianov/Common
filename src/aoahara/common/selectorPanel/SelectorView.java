@@ -1,6 +1,8 @@
 package aoahara.common.selectorPanel;
 
-public interface SelectorView<T> extends SelectorBasePanel {
+import javax.swing.JPanel;
+
+public interface SelectorView<T, C extends JPanel> extends DecoratedComponent<C> {
 	
 	public void display(T element);
 	public T getElement();
