@@ -26,7 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import aohara.common.Listenable;
 
 @SuppressWarnings("serial")
-public class SelectorPanel<T> extends Listenable<ElementClickListener<T>>
+public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		implements MouseListener, ListSelectionListener, SelectorListener<T>,
 		DecoratedComponent<JComponent> {
 	
@@ -106,9 +106,17 @@ public class SelectorPanel<T> extends Listenable<ElementClickListener<T>>
 	public void valueChanged(ListSelectionEvent arg0) {
 		if (!arg0.getValueIsAdjusting()){
 			
+			T element = list.getSelectedValue();
+			
+			// Update all views for selected element
 			for (SelectorView<T, JPanel> view : views){
-				view.display(list.getSelectedValue());
+				view.display(element);
 				view.getComponent().updateUI();
+			}
+			
+			// Notify listeners of selection
+			for (ListListener<T> l : getListeners()){
+				l.elementSelected(element);
 			}
 			
 			
@@ -125,7 +133,7 @@ public class SelectorPanel<T> extends Listenable<ElementClickListener<T>>
 	
 	@Override
 	public void mouseClicked(MouseEvent evt) {
-        for (ElementClickListener<T> l : getListeners()){
+        for (ListListener<T> l : getListeners()){
         	l.elementClicked(list.getSelectedValue(), evt.getClickCount());
         }
     }
