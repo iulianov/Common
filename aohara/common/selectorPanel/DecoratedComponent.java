@@ -1,4 +1,4 @@
-package aoahara.common.selectorPanel;
+package aohara.common.selectorPanel;
 
 import javax.swing.JComponent;
 

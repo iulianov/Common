@@ -1,4 +1,4 @@
-package aoahara.common.selectorPanel;
+package aohara.common.selectorPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -23,7 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import aoahara.common.Listenable;
+import aohara.common.Listenable;
 
 @SuppressWarnings("serial")
 public class SelectorPanel<T> extends Listenable<ElementClickListener<T>>

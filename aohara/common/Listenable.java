@@ -1,4 +1,4 @@
-package aoahara.common;
+package aohara.common;
 
 import java.util.LinkedList;
 

@@ -1,4 +1,4 @@
-package aoahara.common;
+package aohara.common;
 
 /**
  THIS PROGRAM IS PROVIDED "AS IS" WITHOUT ANY WARRANTIES (OR CONDITIONS),
