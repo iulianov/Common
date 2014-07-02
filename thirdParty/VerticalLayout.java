@@ -1,4 +1,4 @@
-package aohara.common;
+package thirdParty;
 
 /**
  THIS PROGRAM IS PROVIDED "AS IS" WITHOUT ANY WARRANTIES (OR CONDITIONS),

@@ -27,7 +27,7 @@ import aohara.common.Listenable;
 
 @SuppressWarnings("serial")
 public class SelectorPanel<T> extends Listenable<ListListener<T>>
-		implements MouseListener, ListSelectionListener, SelectorListener<T>,
+		implements MouseListener, ListSelectionListener, SelectorInterface<T>,
 		DecoratedComponent<JComponent> {
 	
 	private final JSplitPane splitPane = new SelectorSplitPane();
