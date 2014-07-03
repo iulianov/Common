@@ -16,6 +16,7 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	public ProgressDialog(String title){
 		dialog.setLayout(new VerticalLayout());
 		dialog.setTitle(title);
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 		bars.remove(object);
 		
 		dialog.pack();
-		dialog.setVisible(bars.size() > 0);
+		dialog.setVisible(tasksRunning > 0);
 	}
 
 	@Override
