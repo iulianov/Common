@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.util.HashMap;
 
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import thirdParty.VerticalLayout;
@@ -12,6 +13,10 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	
 	private final JDialog dialog = new JDialog();
 	private final HashMap<T, JProgressBar> bars = new HashMap<>();
+	
+	public ProgressDialog(){
+		this("Progress");
+	}
 
 	public ProgressDialog(String title){
 		dialog.setLayout(new VerticalLayout());
@@ -59,6 +64,12 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 
 	@Override
 	public void progressError(T object, int tasksRunning) {
+		JOptionPane.showMessageDialog(
+			dialog,
+			"An error ocurred while processing:\n" + object,
+			"Error!",
+			JOptionPane.ERROR_MESSAGE
+		);
 		progressComplete(object, tasksRunning);
 	}
 }
