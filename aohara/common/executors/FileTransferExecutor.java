@@ -7,11 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.concurrent.Future;
 
 import org.apache.commons.io.FilenameUtils;
 
-public abstract class FileTransferExecutor extends ProgressExecutor<Path> {
+import aohara.common.executors.context.FileTransferContext;
+
+public abstract class FileTransferExecutor extends ProgressExecutor<URL, Path> {
 	
 	protected static final int OVERWRITE = 0, INCREMENT = 1, CANCEL = 2;
 	
@@ -22,32 +23,24 @@ public abstract class FileTransferExecutor extends ProgressExecutor<Path> {
 		this.conflictStrategy = conflictStrategy;
 	}
 	
-	protected Future<Path> submit(URL input, Path dest){
-		try {
-			int totalBytes = input.openConnection().getContentLength();
-			return executor.submit(new FileTask(input, dest, totalBytes));
-		} catch (IOException e) {
-			notifyError(dest);
-			return null;
-		}
+	protected FileTransferContext submit(URL input, Path dest){
+		FileTask task = new FileTask(new FileTransferContext(input, dest));
+		return (FileTransferContext) submit(task);
 	}
 	
 	protected class FileTask extends ExecutorTask {
 		
-		protected final URL input;
-		
-		protected FileTask(URL input, Path dest, int totalBytes){
-			super(dest, totalBytes);
-			this.input = input;
+		public FileTask(FileTransferContext context){
+			super(context);
 		}
 		
 		private final Path incrementPath(){
-			String baseName = FilenameUtils.getBaseName(subject.toString());
-	        String extension = FilenameUtils.getExtension(subject.toString());
+			String baseName = FilenameUtils.getBaseName(getResult().toString());
+	        String extension = FilenameUtils.getExtension(getResult().toString());
 			
 			Path path = null;
 			for (int i=1; path == null || path.toFile().exists(); i++){
-				path = subject.getParent().resolve(String.format("%s (%d).%s", baseName, i, extension));
+				path = getResult().getParent().resolve(String.format("%s (%d).%s", baseName, i, extension));
 			}
 			return path;
 		}
@@ -55,22 +48,22 @@ public abstract class FileTransferExecutor extends ProgressExecutor<Path> {
 		@Override
 		protected void setUp() throws Exception {
 			// Check if destination is a folder
-			if (subject.toFile().isDirectory()){
-				String baseName = FilenameUtils.getBaseName(input.getPath());
-		        String extension = FilenameUtils.getExtension(input.getPath());
-		        subject = subject.resolve(String.format("%s.%s", baseName, extension));
+			if (getResult().toFile().isDirectory()){
+				String baseName = FilenameUtils.getBaseName(getSubject().getPath());
+		        String extension = FilenameUtils.getExtension(getSubject().getPath());
+		        setResult(getResult().resolve(String.format("%s.%s", baseName, extension)));
 			}
 			
 			// If dest parent does not exist, create it
-			if (!subject.getParent().toFile().exists()){
-				subject.getParent().toFile().mkdirs();
+			if (!getResult().getParent().toFile().exists()){
+				getResult().getParent().toFile().mkdirs();
 			}
 			
 			// Check for file conflict
-			if (subject.toFile().isFile() && subject.toFile().exists()){
+			if (getResult().toFile().isFile() && getResult().toFile().exists()){
 				switch(conflictStrategy){
-				case OVERWRITE: subject.toFile().delete(); break;
-				case INCREMENT: subject = incrementPath(); break;
+				case OVERWRITE: getResult().toFile().delete(); break;
+				case INCREMENT: setResult(incrementPath()); break;
 				case CANCEL: throw new Exception();
 				}
 			}
@@ -78,7 +71,7 @@ public abstract class FileTransferExecutor extends ProgressExecutor<Path> {
 		
 		@Override
 		protected void execute() throws Exception {
-			transfer(input, subject);		
+			transfer(getSubject(), getResult());		
 		}
 		
 		protected final void transfer(URL input, Path dest) throws IOException {

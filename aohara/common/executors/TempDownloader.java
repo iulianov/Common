@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.Future;
+
+import aohara.common.executors.context.FileTransferContext;
 
 public class TempDownloader extends Downloader {
 	
@@ -16,37 +17,38 @@ public class TempDownloader extends Downloader {
 	}
 	
 	@Override
-	protected Future<Path> submit(URL input, Path dest){
+	protected FileTransferContext submit(URL input, Path dest){
 		try {
 			int totalBytes = input.openConnection().getContentLength();
 			if (totalBytes < 0){
 				throw new IOException();
 			}
-			return executor.submit(new TempDownloadTask(
-				input, dest, Files.createTempFile("download", ".temp"),
-				totalBytes));
+			FileTransferContext context = new FileTransferContext(input, dest);
+			return (FileTransferContext) submit(new TempDownloadTask(
+				context, Files.createTempFile("download", ".temp")
+			));
 		} catch (IOException e) {
 			notifyError(dest);
 			return null;
 		}
 	}
 	
-	private class TempDownloadTask extends FileTask {
+	public class TempDownloadTask extends FileTask {
 		
 		private final Path tempPath;
 		
-		private TempDownloadTask(URL input, Path dest, Path tempPath, int totalBytes){
-			super(input, dest, totalBytes);
+		public TempDownloadTask(FileTransferContext context, Path tempPath){
+			super(context);
 			this.tempPath = tempPath;
 		}
 		
 		@Override
 		public void execute() throws Exception {
 			// Download to temporary file, and then move over to destination
-			transfer(input, tempPath);
+			transfer(getSubject(), tempPath);
 			
 			// Move to destination, and wait on the copy
-			fileMover.copy(tempPath, subject).get();
+			fileMover.copy(tempPath, getResult()).join();
 		}
 	}
 

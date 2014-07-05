@@ -5,8 +5,9 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,7 +33,7 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	
 	private final JSplitPane splitPane = new SelectorSplitPane();
 	private final JList<T> list = new JList<T>(new DefaultListModel<T>());
-	private Collection<T> elements = new LinkedList<>();
+	private Collection<T> elements = new HashSet<>();
 	private final Collection<SelectorView<T, JPanel>> views = new ArrayList<>(); 
 	private JScrollPane scrollPane;
 
@@ -175,7 +176,11 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 				
 				T selected = list.getSelectedValue();
 				
-				if (model.getSize() != elements.size()){
+				Object[] arr = new Object[model.getSize()];
+				model.copyInto(arr);
+				HashSet<Object> set = new HashSet<>(Arrays.asList(arr));
+				
+				if (!set.equals(elements)){
 					model.removeAllElements();
 					for (T ele : elements){
 						model.addElement(ele);

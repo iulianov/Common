@@ -2,7 +2,8 @@ package aohara.common.executors;
 
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.concurrent.Future;
+
+import aohara.common.executors.context.FileTransferContext;
 
 public class Downloader extends FileTransferExecutor {
 
@@ -10,7 +11,7 @@ public class Downloader extends FileTransferExecutor {
 		super(numThreads, FileTransferExecutor.INCREMENT);
 	}
 
-	public Future<Path> download(URL url, Path path) {
+	public FileTransferContext download(URL url, Path path) {
 		return submit(url, path);
 	}
 }
