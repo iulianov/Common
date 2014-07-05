@@ -4,10 +4,10 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.concurrent.Future;
 
-public class FileCopier extends FileExecutor {
+public class FileCopier extends FileTransferExecutor {
 	
 	public FileCopier(){
-		super(1, FileExecutor.OVERWRITE);
+		super(1, FileTransferExecutor.OVERWRITE);
 	}
 	
 	public Future<Path> copy(Path src, Path dest){

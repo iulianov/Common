@@ -11,13 +11,13 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.io.FilenameUtils;
 
-public abstract class FileExecutor extends ProgressExecutor<Path> {
+public abstract class FileTransferExecutor extends ProgressExecutor<Path> {
 	
 	protected static final int OVERWRITE = 0, INCREMENT = 1, CANCEL = 2;
 	
 	private final int conflictStrategy;
 	
-	protected FileExecutor(int numThreads, int conflictStrategy){
+	protected FileTransferExecutor(int numThreads, int conflictStrategy){
 		super(numThreads);
 		this.conflictStrategy = conflictStrategy;
 	}

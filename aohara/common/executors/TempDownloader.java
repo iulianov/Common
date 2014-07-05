@@ -16,12 +16,8 @@ public class TempDownloader extends Downloader {
 	}
 	
 	@Override
-	public Future<Path> download(URL url, Path path) {
-		return submit(url, path);
-	}
-	
-	@Override
 	protected Future<Path> submit(URL input, Path dest){
+		System.err.println("foo");
 		try {
 			int totalBytes = input.openConnection().getContentLength();
 			return executor.submit(new TempDownloadTask(
