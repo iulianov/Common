@@ -17,9 +17,11 @@ public class TempDownloader extends Downloader {
 	
 	@Override
 	protected Future<Path> submit(URL input, Path dest){
-		System.err.println("foo");
 		try {
 			int totalBytes = input.openConnection().getContentLength();
+			if (totalBytes < 0){
+				throw new IOException();
+			}
 			return executor.submit(new TempDownloadTask(
 				input, dest, Files.createTempFile("download", ".temp"),
 				totalBytes));
