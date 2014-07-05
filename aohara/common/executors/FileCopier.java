@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
 public class FileCopier extends FileExecutor {
 	
 	public FileCopier(){
-		super(1, FileExecutor.OVERWRITE, false);
+		super(1, FileExecutor.OVERWRITE);
 	}
 	
 	public Future<Path> copy(Path src, Path dest){
