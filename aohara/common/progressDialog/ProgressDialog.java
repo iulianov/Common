@@ -26,7 +26,9 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 
 	@Override
 	public void progressStarted(T object, int target, int tasksRunning) {
-		JProgressBar bar = new JProgressBar(0, target);
+		JProgressBar bar = new JProgressBar();
+		bar.setMaximum(target > 0 ? target : 0);
+		bar.setIndeterminate(target < 0);
 		bar.setStringPainted(true);
 		bar.setPreferredSize(new Dimension(400, 50));
 		dialog.add(bar);
@@ -39,15 +41,17 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	}
 	
 	@Override
-	public void progressMade(T object, int current) {
+	public void progressMade(T object, int current) {		
 		JProgressBar bar = bars.get(object);
 		try {
 			bar.setValue(current);
-			bar.setString(String.format(
-				"%s - %.2f%%",
-				object,
-				(current / (float) bar.getMaximum()) * 100
-			));
+			if (bar.isIndeterminate()){
+				bar.setString(object.toString());
+			} else {
+				bar.setString(String.format(
+					"%s - %.2f%%", object,
+					(current / (float) bar.getMaximum()) * 100));
+			}
 		} catch (Throwable t){
 			t.printStackTrace();
 		}
@@ -55,11 +59,15 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 
 	@Override
 	public void progressComplete(T object, int tasksRunning) {
-		dialog.remove(bars.get(object));
-		bars.remove(object);
+		JProgressBar bar = bars.get(object);
 		
-		dialog.pack();
-		dialog.setVisible(tasksRunning > 0);
+		if (bar != null){
+			dialog.remove(bar);
+			bars.remove(object);
+			
+			dialog.pack();
+			dialog.setVisible(tasksRunning > 0);
+		}
 	}
 
 	@Override

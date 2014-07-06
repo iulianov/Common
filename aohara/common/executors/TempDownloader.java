@@ -9,26 +9,23 @@ import aohara.common.executors.context.FileTransferContext;
 
 public class TempDownloader extends Downloader {
 	
-	private final FileMover fileMover;
-	
-	public TempDownloader(int numThreads, FileMover fileMover){
-		super(numThreads);
-		this.fileMover = fileMover;
+	public TempDownloader(int numThreads, FileConflictResolver conflictStrategy){
+		super(numThreads, conflictStrategy);
 	}
 	
 	@Override
 	protected FileTransferContext submit(URL input, Path dest){
+		FileTransferContext context = new FileTransferContext(input, dest);
 		try {
 			int totalBytes = input.openConnection().getContentLength();
 			if (totalBytes < 0){
 				throw new IOException();
 			}
-			FileTransferContext context = new FileTransferContext(input, dest);
 			return (FileTransferContext) submit(new TempDownloadTask(
 				context, Files.createTempFile("download", ".temp")
 			));
 		} catch (IOException e) {
-			notifyError(dest);
+			notifyError(context);
 			return null;
 		}
 	}
@@ -43,12 +40,17 @@ public class TempDownloader extends Downloader {
 		}
 		
 		@Override
-		public void execute() throws Exception {
+		public FileTransferContext execute() throws Exception {
 			// Download to temporary file, and then move over to destination
-			transfer(getSubject(), tempPath);
+			transfer(getSource(), tempPath);
+			notifySuccess();
 			
-			// Move to destination, and wait on the copy
-			fileMover.copy(tempPath, getResult()).join();
+			// Perform Move
+			notifyStart((int) tempPath.toFile().length());
+			this.transfer(tempPath.toUri().toURL(), context.getDest());
+			tempPath.toFile().delete();
+
+			return context;
 		}
 	}
 

@@ -8,7 +8,7 @@ import aohara.common.Listenable;
 import aohara.common.executors.context.ExecutorContext;
 import aohara.common.progressDialog.ProgressListener;
 
-public class ProgressExecutor<A, B> extends Listenable<ProgressListener<B>>{
+public class ProgressExecutor<C extends ExecutorContext> extends Listenable<ProgressListener<C>> {
 	
 	private final ThreadPoolExecutor executor;
 	private int running = 0;
@@ -21,80 +21,78 @@ public class ProgressExecutor<A, B> extends Listenable<ProgressListener<B>>{
 		return executor.getQueue().size() + running;
 	}
 	
-	protected void notifyError(B result){
-		for (ProgressListener<B> l : getListeners()) {
-			l.progressError(result, getProcessing());
-		}
-	}
-	
-	protected ExecutorContext<A, B> submit(ExecutorTask task){
+	public ExecutorContext submit(ExecutorTask task){
 		task.context.setFuture(executor.submit(task));
 		return task.context;
 	}
 	
-	protected abstract class ExecutorTask implements Callable<B> {
+	protected void notifyError(C context){
+		for (ProgressListener<C> l : getListeners()) {
+			l.progressError(context, getProcessing());
+		}
+	}
+	
+	// -- Task ------------------------------------------------------------
+	
+	protected abstract class ExecutorTask implements Callable<C> {
 		
-		private final ExecutorContext<A, B> context;
+		protected final C context;
 		
-		protected ExecutorTask(ExecutorContext<A, B> context){
+		protected ExecutorTask(C context){
 			this.context = context;
 		}
 
 		@Override
-		public final B call() {
-			// Try to perform setup
+		public final C call() {
 			try {
 				setUp();
-			} catch (Exception e1) {
-				notifyError(context.getResult());
-			}
-			
-			// Start Task
-			running++;
-			for (ProgressListener<B> l : getListeners()) {
-				l.progressStarted(context.getResult(), context.getTotalProgress(),getProcessing());
-			}
-			
-			try {
-				execute();
+				
+				// Start task
+				running++;
+				notifyStart(context.getTotalProgress());
+
+				C result = execute();
+				
 				// Notify of Success
 				running--;
-				for (ProgressListener<B> l : getListeners()) {
-					l.progressComplete(context.getResult(), getProcessing());
-				}
-				return getResult();
+				notifySuccess();
+				return result;
 			} catch (Exception e){
 				running--;
-				notifyError(context.getResult());
+				notifyError(context);
+				e.printStackTrace();
 			}
-			
 			return null;
+		}
+		
+		// -- Notifiers ------------------------------------------------
+		
+		protected void notifyStart(int totalProgress){
+			for (ProgressListener<C> l : getListeners()) {
+				l.progressStarted(context, totalProgress, getProcessing());
+			}
+		}
+		
+		protected void notifySuccess(){
+			for (ProgressListener<C> l : getListeners()) {
+				l.progressComplete(context, getProcessing());
+			}
 		}
 		
 		protected void progress(int progress){
 			context.addProgress(progress);
-			for (ProgressListener<B> l : getListeners()) {
-				l.progressMade(context.getResult(), context.getProgress());
+			for (ProgressListener<C> l : getListeners()) {
+				l.progressMade(context, context.getProgress());
 			}
 		}
 		
-		protected A getSubject(){
-			return context.getSubject();
-		}
-		
-		protected B getResult(){
-			return context.getResult();
-		}
-		
-		protected void setResult(B result){
-			context.setResult(result);
-		}
+		// - Abstract Methods --------------------------------------------
 		
 		protected void setUp() throws Exception {
 			// No action
 		}
 		
-		protected abstract void execute() throws Exception;
+		protected abstract C execute() throws Exception;
 		
 	}
 

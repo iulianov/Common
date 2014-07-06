@@ -12,13 +12,13 @@ import org.apache.commons.io.FilenameUtils;
 
 import aohara.common.executors.context.FileTransferContext;
 
-public abstract class FileTransferExecutor extends ProgressExecutor<URL, Path> {
+public abstract class FileTransferExecutor extends ProgressExecutor<FileTransferContext> {
 	
-	protected static final int OVERWRITE = 0, INCREMENT = 1, CANCEL = 2;
+	public static enum FileConflictResolver { Overwrite, Increment, Cancel };
 	
-	private final int conflictStrategy;
+	protected final FileConflictResolver conflictStrategy;
 	
-	protected FileTransferExecutor(int numThreads, int conflictStrategy){
+	protected FileTransferExecutor(int numThreads, FileConflictResolver conflictStrategy){
 		super(numThreads);
 		this.conflictStrategy = conflictStrategy;
 	}
@@ -28,19 +28,19 @@ public abstract class FileTransferExecutor extends ProgressExecutor<URL, Path> {
 		return (FileTransferContext) submit(task);
 	}
 	
-	protected class FileTask extends ExecutorTask {
+	public class FileTask extends ExecutorTask {
 		
 		public FileTask(FileTransferContext context){
 			super(context);
 		}
 		
 		private final Path incrementPath(){
-			String baseName = FilenameUtils.getBaseName(getResult().toString());
-	        String extension = FilenameUtils.getExtension(getResult().toString());
+			String baseName = FilenameUtils.getBaseName(getDest().toString());
+	        String extension = FilenameUtils.getExtension(getDest().toString());
 			
 			Path path = null;
 			for (int i=1; path == null || path.toFile().exists(); i++){
-				path = getResult().getParent().resolve(String.format("%s (%d).%s", baseName, i, extension));
+				path = getDest().getParent().resolve(String.format("%s (%d).%s", baseName, i, extension));
 			}
 			return path;
 		}
@@ -48,30 +48,39 @@ public abstract class FileTransferExecutor extends ProgressExecutor<URL, Path> {
 		@Override
 		protected void setUp() throws Exception {
 			// Check if destination is a folder
-			if (getResult().toFile().isDirectory()){
-				String baseName = FilenameUtils.getBaseName(getSubject().getPath());
-		        String extension = FilenameUtils.getExtension(getSubject().getPath());
-		        setResult(getResult().resolve(String.format("%s.%s", baseName, extension)));
+			if (getDest().toFile().isDirectory()){
+				String baseName = FilenameUtils.getBaseName(getSource().getPath());
+		        String extension = FilenameUtils.getExtension(getSource().getPath());
+		        context.setDest(getDest().resolve(String.format("%s.%s", baseName, extension)));
 			}
 			
 			// If dest parent does not exist, create it
-			if (!getResult().getParent().toFile().exists()){
-				getResult().getParent().toFile().mkdirs();
+			if (!getDest().getParent().toFile().exists()){
+				getDest().getParent().toFile().mkdirs();
 			}
 			
 			// Check for file conflict
-			if (getResult().toFile().isFile() && getResult().toFile().exists()){
+			if (getDest().toFile().isFile() && getDest().toFile().exists()){
 				switch(conflictStrategy){
-				case OVERWRITE: getResult().toFile().delete(); break;
-				case INCREMENT: setResult(incrementPath()); break;
-				case CANCEL: throw new Exception();
+				case Overwrite: getDest().toFile().delete(); break;
+				case Increment: context.setDest(incrementPath()); break;
+				case Cancel: throw new Exception();
 				}
 			}
 		}
 		
+		protected Path getDest(){
+			return context.getDest();
+		}
+		
+		protected URL getSource(){
+			return context.getSource();
+		}
+		
 		@Override
-		protected void execute() throws Exception {
-			transfer(getSubject(), getResult());		
+		protected FileTransferContext execute() throws Exception {
+			transfer(getSource(), getDest());		
+			return context;
 		}
 		
 		protected final void transfer(URL input, Path dest) throws IOException {

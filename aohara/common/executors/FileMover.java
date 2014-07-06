@@ -1,16 +1,26 @@
 package aohara.common.executors;
 
-import java.net.URL;
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 
 import aohara.common.executors.context.FileTransferContext;
 
 public class FileMover extends FileCopier {
 	
-	@Override
-	protected FileTransferContext submit(URL input, Path dest){
-		FileTask task = new MoveTask(new FileTransferContext(input, dest));
-		return (FileTransferContext) submit(task);
+	public FileMover(FileConflictResolver fileConflictResolver){
+		super(fileConflictResolver);
+	}
+	
+	public FileTransferContext move(Path src, Path dest){
+		try {
+			FileTask task = new MoveTask(new FileTransferContext(
+					src.toUri().toURL(), dest));
+			return (FileTransferContext) submit(task);
+		} catch (MalformedURLException e) {
+			notifyError(null);
+			return null;
+		}
+		
 	}
 	
 	protected class MoveTask extends FileTask {
@@ -20,11 +30,10 @@ public class FileMover extends FileCopier {
 		}
 		
 		@Override
-		protected void execute() throws Exception {
-			super.execute();
-			getResult().toFile().delete();	
+		protected FileTransferContext execute() throws Exception {
+			FileTransferContext context = super.execute();
+			getDest().toFile().delete();	
+			return context;
 		}
-		
 	}
-
 }
