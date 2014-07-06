@@ -34,53 +34,44 @@ public abstract class FileTransferExecutor extends ProgressExecutor<FileTransfer
 			super(context);
 		}
 		
-		private final Path incrementPath(){
-			String baseName = FilenameUtils.getBaseName(getDest().toString());
-	        String extension = FilenameUtils.getExtension(getDest().toString());
+		private final Path incrementPath(FileTransferContext context){
+			String baseName = FilenameUtils.getBaseName(context.getDest().toString());
+	        String extension = FilenameUtils.getExtension(context.getDest().toString());
 			
 			Path path = null;
 			for (int i=1; path == null || path.toFile().exists(); i++){
-				path = getDest().getParent().resolve(String.format("%s (%d).%s", baseName, i, extension));
+				path = context.getDest().getParent().resolve(String.format("%s (%d).%s", baseName, i, extension));
 			}
 			return path;
 		}
 		
 		@Override
-		protected void setUp() throws Exception {
+		protected void setUp(FileTransferContext context) throws Exception {
 			// Check if destination is a folder
-			if (getDest().toFile().isDirectory()){
-				String baseName = FilenameUtils.getBaseName(getSource().getPath());
-		        String extension = FilenameUtils.getExtension(getSource().getPath());
-		        context.setDest(getDest().resolve(String.format("%s.%s", baseName, extension)));
+			if (context.getDest().toFile().isDirectory()){
+				String baseName = FilenameUtils.getBaseName(context.getSource().getPath());
+		        String extension = FilenameUtils.getExtension(context.getSource().getPath());
+		        context.setDest(context.getDest().resolve(String.format("%s.%s", baseName, extension)));
 			}
 			
 			// If dest parent does not exist, create it
-			if (!getDest().getParent().toFile().exists()){
-				getDest().getParent().toFile().mkdirs();
+			if (!context.getDest().getParent().toFile().exists()){
+				context.getDest().getParent().toFile().mkdirs();
 			}
 			
 			// Check for file conflict
-			if (getDest().toFile().isFile() && getDest().toFile().exists()){
+			if (context.getDest().toFile().isFile() && context.getDest().toFile().exists()){
 				switch(conflictStrategy){
-				case Overwrite: getDest().toFile().delete(); break;
-				case Increment: context.setDest(incrementPath()); break;
+				case Overwrite: context.getDest().toFile().delete(); break;
+				case Increment: context.setDest(incrementPath(context)); break;
 				case Cancel: throw new Exception();
 				}
 			}
 		}
 		
-		protected Path getDest(){
-			return context.getDest();
-		}
-		
-		protected URL getSource(){
-			return context.getSource();
-		}
-		
 		@Override
-		protected FileTransferContext execute() throws Exception {
-			transfer(getSource(), getDest());		
-			return context;
+		protected void execute(FileTransferContext context) throws Exception {
+			transfer(context.getSource(), context.getDest());
 		}
 		
 		protected final void transfer(URL input, Path dest) throws IOException {

@@ -7,6 +7,7 @@ public abstract class ExecutorContext {
 	
 	private int progress = 0;
 	private Future<?> future;
+	private boolean success = false;
 	
 	public void addProgress(int moreProgress){
 		progress += moreProgress;
@@ -31,6 +32,14 @@ public abstract class ExecutorContext {
 	
 	public void join() throws InterruptedException, ExecutionException{
 		future.get();
+	}
+	
+	public void setSuccesful(){
+		success = true;
+	}
+	
+	public boolean isSuccessful(){
+		return success;
 	}
 	
 	@Override

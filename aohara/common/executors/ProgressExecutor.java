@@ -36,7 +36,7 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 	
 	protected abstract class ExecutorTask implements Callable<C> {
 		
-		protected final C context;
+		private final C context;
 		
 		protected ExecutorTask(C context){
 			this.context = context;
@@ -45,24 +45,24 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 		@Override
 		public final C call() {
 			try {
-				setUp();
+				setUp(context);
 				
 				// Start task
 				running++;
 				notifyStart(context.getTotalProgress());
 
-				C result = execute();
+				execute(context);
 				
 				// Notify of Success
 				running--;
+				context.setSuccesful();
 				notifySuccess();
-				return result;
 			} catch (Exception e){
 				running--;
 				notifyError(context);
 				e.printStackTrace();
 			}
-			return null;
+			return context;
 		}
 		
 		// -- Notifiers ------------------------------------------------
@@ -88,11 +88,11 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 		
 		// - Abstract Methods --------------------------------------------
 		
-		protected void setUp() throws Exception {
+		protected void setUp(C context) throws Exception {
 			// No action
 		}
 		
-		protected abstract C execute() throws Exception;
+		protected abstract void execute(C context) throws Exception;
 		
 	}
 

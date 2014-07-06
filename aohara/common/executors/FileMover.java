@@ -30,10 +30,9 @@ public class FileMover extends FileCopier {
 		}
 		
 		@Override
-		protected FileTransferContext execute() throws Exception {
-			FileTransferContext context = super.execute();
-			getDest().toFile().delete();	
-			return context;
+		protected void execute(FileTransferContext context) throws Exception {
+			super.execute(context);
+			context.getDest().toFile().delete();
 		}
 	}
 }

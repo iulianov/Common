@@ -40,17 +40,15 @@ public class TempDownloader extends Downloader {
 		}
 		
 		@Override
-		public FileTransferContext execute() throws Exception {
+		public void execute(FileTransferContext context) throws Exception {
 			// Download to temporary file, and then move over to destination
-			transfer(getSource(), tempPath);
+			transfer(context.getSource(), tempPath);
 			notifySuccess();
 			
 			// Perform Move
 			notifyStart((int) tempPath.toFile().length());
 			this.transfer(tempPath.toUri().toURL(), context.getDest());
 			tempPath.toFile().delete();
-
-			return context;
 		}
 	}
 
