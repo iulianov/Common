@@ -14,6 +14,7 @@ import java.util.TimerTask;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -117,7 +118,11 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 			
 			// Notify listeners of selection
 			for (ListListener<T> l : getListeners()){
-				l.elementSelected(element);
+				try {
+					l.elementSelected(element);
+				} catch (Exception e) {
+					errorMessage(e.getMessage());
+				}
 			}
 			
 			
@@ -135,9 +140,18 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	@Override
 	public void mouseClicked(MouseEvent evt) {
         for (ListListener<T> l : getListeners()){
-        	l.elementClicked(list.getSelectedValue(), evt.getClickCount());
+        	try {
+				l.elementClicked(list.getSelectedValue(), evt.getClickCount());
+			} catch (Exception e) {
+				errorMessage(e.getMessage());
+			}
         }
     }
+	
+	private void errorMessage(String message){
+		JOptionPane.showMessageDialog(
+				splitPane, message, "Error!", JOptionPane.ERROR_MESSAGE);
+	}
 	
 	@Override
 	public void mousePressed(MouseEvent e) { /* N/A */}
