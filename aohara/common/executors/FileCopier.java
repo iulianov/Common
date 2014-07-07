@@ -13,7 +13,7 @@ public class FileCopier extends FileTransferExecutor {
 	
 	public FileTransferContext copy(Path src, Path dest){
 		try {
-			return submit(src.toUri().toURL(), dest);
+			return transfer(src.toUri().toURL(), dest);
 		} catch (MalformedURLException e) {
 			notifyError(null);
 			return null;

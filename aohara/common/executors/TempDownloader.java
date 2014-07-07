@@ -14,20 +14,20 @@ public class TempDownloader extends Downloader {
 	}
 	
 	@Override
-	protected FileTransferContext submit(URL input, Path dest){
-		FileTransferContext context = new FileTransferContext(input, dest);
+	public FileTransferContext submit(FileTransferContext context){
 		try {
-			int totalBytes = input.openConnection().getContentLength();
-			if (totalBytes < 0){
-				throw new IOException();
-			}
-			return (FileTransferContext) submit(new TempDownloadTask(
-				context, Files.createTempFile("download", ".temp")
-			));
+			submit(new TempDownloadTask(
+					context, Files.createTempFile("download", ".temp")));
+			return context;
 		} catch (IOException e) {
 			notifyError(context);
 			return null;
 		}
+	}
+	
+	@Override
+	public FileTransferContext transfer(URL input, Path dest){
+		return submit(new FileTransferContext(input, dest));
 	}
 	
 	public class TempDownloadTask extends FileTask {
@@ -43,12 +43,11 @@ public class TempDownloader extends Downloader {
 		public void execute(FileTransferContext context) throws Exception {
 			// Download to temporary file, and then move over to destination
 			transfer(context.getSource(), tempPath);
-			notifySuccess();
 			
 			// Perform Move
-			notifyStart((int) tempPath.toFile().length());
 			this.transfer(tempPath.toUri().toURL(), context.getDest());
 			tempPath.toFile().delete();
+			System.err.println("done moving temp to dest");
 		}
 	}
 

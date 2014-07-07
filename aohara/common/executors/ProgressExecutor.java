@@ -21,7 +21,7 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 		return executor.getQueue().size() + running;
 	}
 	
-	public ExecutorContext submit(ExecutorTask task){
+	protected ExecutorContext submit(ExecutorTask task){
 		task.context.setFuture(executor.submit(task));
 		return task.context;
 	}

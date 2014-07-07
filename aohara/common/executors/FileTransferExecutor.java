@@ -27,7 +27,7 @@ public abstract class FileTransferExecutor extends ProgressExecutor<FileTransfer
 		return (FileTransferContext) submit(new FileTask(context));
 	}
 	
-	protected FileTransferContext submit(URL input, Path dest){
+	protected FileTransferContext transfer(URL input, Path dest){
 		FileTask task = new FileTask(new FileTransferContext(input, dest));
 		return (FileTransferContext) submit(task);
 	}
