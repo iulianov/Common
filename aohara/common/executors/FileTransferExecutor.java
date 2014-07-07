@@ -23,6 +23,10 @@ public abstract class FileTransferExecutor extends ProgressExecutor<FileTransfer
 		this.conflictStrategy = conflictStrategy;
 	}
 	
+	public FileTransferContext submit(FileTransferContext context){
+		return (FileTransferContext) submit(new FileTask(context));
+	}
+	
 	protected FileTransferContext submit(URL input, Path dest){
 		FileTask task = new FileTask(new FileTransferContext(input, dest));
 		return (FileTransferContext) submit(task);

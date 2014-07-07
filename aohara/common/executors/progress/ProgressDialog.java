@@ -1,4 +1,4 @@
-package aohara.common.progressDialog;
+package aohara.common.executors.progress;
 
 import java.awt.Dimension;
 import java.util.HashMap;
@@ -7,12 +7,13 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
+import aohara.common.executors.context.ExecutorContext;
 import thirdParty.VerticalLayout;
 
-public class ProgressDialog<T> implements ProgressListener<T> {
+public class ProgressDialog implements ProgressListener {
 	
 	private final JDialog dialog = new JDialog();
-	private final HashMap<T, JProgressBar> bars = new HashMap<>();
+	private final HashMap<ExecutorContext, JProgressBar> bars = new HashMap<>();
 	
 	public ProgressDialog(){
 		this("Progress");
@@ -25,7 +26,7 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	}
 
 	@Override
-	public void progressStarted(T object, int target, int tasksRunning) {
+	public void progressStarted(ExecutorContext object, int target, int tasksRunning) {
 		JProgressBar bar = new JProgressBar();
 		bar.setMaximum(target > 0 ? target : 0);
 		bar.setIndeterminate(target < 0);
@@ -41,7 +42,7 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	}
 	
 	@Override
-	public void progressMade(T object, int current) {		
+	public void progressMade(ExecutorContext object, int current) {		
 		JProgressBar bar = bars.get(object);
 		try {
 			bar.setValue(current);
@@ -58,7 +59,7 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	}
 
 	@Override
-	public void progressComplete(T object, int tasksRunning) {
+	public void progressComplete(ExecutorContext object, int tasksRunning) {
 		JProgressBar bar = bars.get(object);
 		
 		if (bar != null){
@@ -71,7 +72,7 @@ public class ProgressDialog<T> implements ProgressListener<T> {
 	}
 
 	@Override
-	public void progressError(T object, int tasksRunning) {
+	public void progressError(ExecutorContext object, int tasksRunning) {
 		JOptionPane.showMessageDialog(
 			dialog,
 			"An error ocurred while processing:\n" + object,

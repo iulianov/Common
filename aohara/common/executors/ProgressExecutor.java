@@ -6,9 +6,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import aohara.common.Listenable;
 import aohara.common.executors.context.ExecutorContext;
-import aohara.common.progressDialog.ProgressListener;
+import aohara.common.executors.progress.ProgressListener;
 
-public class ProgressExecutor<C extends ExecutorContext> extends Listenable<ProgressListener<C>> {
+public class ProgressExecutor<C extends ExecutorContext> extends Listenable<ProgressListener> {
 	
 	private final ThreadPoolExecutor executor;
 	private int running = 0;
@@ -27,7 +27,7 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 	}
 	
 	protected void notifyError(C context){
-		for (ProgressListener<C> l : getListeners()) {
+		for (ProgressListener l : getListeners()) {
 			l.progressError(context, getProcessing());
 		}
 	}
@@ -68,20 +68,20 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 		// -- Notifiers ------------------------------------------------
 		
 		protected void notifyStart(int totalProgress){
-			for (ProgressListener<C> l : getListeners()) {
+			for (ProgressListener l : getListeners()) {
 				l.progressStarted(context, totalProgress, getProcessing());
 			}
 		}
 		
 		protected void notifySuccess(){
-			for (ProgressListener<C> l : getListeners()) {
+			for (ProgressListener l : getListeners()) {
 				l.progressComplete(context, getProcessing());
 			}
 		}
 		
 		protected void progress(int progress){
 			context.addProgress(progress);
-			for (ProgressListener<C> l : getListeners()) {
+			for (ProgressListener l : getListeners()) {
 				l.progressMade(context, context.getProgress());
 			}
 		}
