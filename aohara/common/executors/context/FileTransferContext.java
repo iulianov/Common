@@ -1,6 +1,5 @@
 package aohara.common.executors.context;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -12,15 +11,6 @@ public class FileTransferContext extends ExecutorContext {
 	public FileTransferContext(URL subject, Path result) {
 		this.source = subject;
 		this.dest = result;
-	}
-
-	@Override
-	public int getTotalProgress() {
-		try {
-			return getSource().openConnection().getContentLength();
-		} catch (IOException e) {
-			return -1;
-		}
 	}
 
 	@Override

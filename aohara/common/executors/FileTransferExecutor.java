@@ -91,5 +91,14 @@ public abstract class FileTransferExecutor extends ProgressExecutor<FileTransfer
 				}
 			}
 		}
+
+		@Override
+		protected int getTotalProgress(FileTransferContext context) {
+			try {
+				return context.getSource().openConnection().getContentLength();
+			} catch (IOException e) {
+				return -1;
+			}
+		}
 	}
 }

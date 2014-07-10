@@ -44,6 +44,5 @@ public abstract class ExecutorContext {
 	
 	@Override
 	public abstract String toString();
-	public abstract int getTotalProgress();
 
 }

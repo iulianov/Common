@@ -49,7 +49,7 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 				
 				// Start task
 				running++;
-				notifyStart(context.getTotalProgress());
+				notifyStart(getTotalProgress(context));
 
 				execute(context);
 				
@@ -93,6 +93,7 @@ public class ProgressExecutor<C extends ExecutorContext> extends Listenable<Prog
 		}
 		
 		protected abstract void execute(C context) throws Exception;
+		protected abstract int getTotalProgress(C context);
 		
 	}
 

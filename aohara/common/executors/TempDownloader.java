@@ -45,9 +45,17 @@ public class TempDownloader extends Downloader {
 			transfer(context.getSource(), tempPath);
 			
 			// Perform Move
-			this.transfer(tempPath.toUri().toURL(), context.getDest());
+			transfer(tempPath.toUri().toURL(), context.getDest());
 			tempPath.toFile().delete();
-			System.err.println("done moving temp to dest");
+		}
+		
+		@Override
+		protected int getTotalProgress(FileTransferContext context) {
+			try {
+				return context.getSource().openConnection().getContentLength() * 2;
+			} catch (IOException e) {
+				return -1;
+			}
 		}
 	}
 
