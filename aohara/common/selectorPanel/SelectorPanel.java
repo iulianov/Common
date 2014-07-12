@@ -139,13 +139,24 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	
 	@Override
 	public void mouseClicked(MouseEvent evt) {
-        for (ListListener<T> l : getListeners()){
-        	try {
+		for (ListListener<T> l : getListeners()){
+			try {
 				l.elementClicked(list.getSelectedValue(), evt.getClickCount());
 			} catch (Exception e) {
 				errorMessage(e.getMessage());
 			}
-        }
+		}
+		
+		if (SwingUtilities.isRightMouseButton(evt)){
+			selectIndex(list.locationToIndex(evt.getPoint()));
+			 for (ListListener<T> l : getListeners()){
+				 try {
+					l.elementRightClicked(evt, list.getSelectedValue());
+				} catch (Exception e) {
+					errorMessage(e.getMessage());
+				}
+			 }
+		}
     }
 	
 	private void errorMessage(String message){
