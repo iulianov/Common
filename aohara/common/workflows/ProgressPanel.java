@@ -12,6 +12,7 @@ import javax.swing.JProgressBar;
 
 import thirdParty.VerticalLayout;
 import aohara.common.selectorPanel.DecoratedComponent;
+import aohara.common.workflows.tasks.WorkflowTask;
 
 public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	

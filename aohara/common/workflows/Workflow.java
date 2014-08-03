@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import aohara.common.Listenable;
+import aohara.common.workflows.tasks.DeleteTask;
+import aohara.common.workflows.tasks.FileTransferTask;
+import aohara.common.workflows.tasks.WorkflowTask;
 
 public class Workflow extends Listenable<TaskListener> implements Runnable {
 

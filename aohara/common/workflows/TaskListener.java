@@ -1,5 +1,7 @@
 package aohara.common.workflows;
 
+import aohara.common.workflows.tasks.WorkflowTask;
+
 public interface TaskListener {
 	
 	public void taskStarted(WorkflowTask task, int targetProgress);
