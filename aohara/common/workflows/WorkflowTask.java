@@ -6,7 +6,7 @@ public abstract class WorkflowTask implements Callable<Boolean> {
 	
 	public final Workflow workflow;
 	
-	protected WorkflowTask(Workflow workflow){
+	public WorkflowTask(Workflow workflow){
 		this.workflow = workflow;
 	}
 	
