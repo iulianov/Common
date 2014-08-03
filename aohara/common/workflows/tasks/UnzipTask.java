@@ -2,25 +2,26 @@ package aohara.common.workflows.tasks;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 
 import aohara.common.workflows.ConflictResolver;
-import aohara.common.workflows.Workflow;
 import aohara.common.workflows.ConflictResolver.Resolution;
+import aohara.common.workflows.Workflow;
 
 public class UnzipTask extends WorkflowTask {
 	
 	private final Path zipPath, destPath;
-	private final Set<ZipEntry> zipEntries;
+	private final Map<ZipEntry, Path> zipEntries;
 	private final ConflictResolver cr;
 	
 	public UnzipTask(
 			Workflow workflow, Path zipPath, Path destPath,
-			Set<ZipEntry> zipEntries, ConflictResolver cr){
+			Map<ZipEntry, Path> zipEntries, ConflictResolver cr){
 		super(workflow);
 		this.zipPath = zipPath;
 		this.destPath = destPath;
@@ -30,7 +31,7 @@ public class UnzipTask extends WorkflowTask {
 
 	@Override
 	public Boolean call() throws Exception {
-		if (destPath.toFile().exists()){
+		if (destPath.toFile().isFile() && destPath.toFile().exists()){
 			Resolution res = cr.getResolution(destPath);
 			if (res.equals(Resolution.Overwrite)){
 				FileUtils.deleteDirectory(destPath.toFile());
@@ -49,10 +50,10 @@ public class UnzipTask extends WorkflowTask {
 	
 	private void unzip() throws IOException {
 		try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
-			for (ZipEntry entry : zipEntries) {
+			for (Entry<ZipEntry, Path> entry : zipEntries.entrySet()) {
 				FileUtils.copyInputStreamToFile(
-					zipFile.getInputStream(entry),
-					destPath.resolve(entry.getName()).toFile());
+					zipFile.getInputStream(entry.getKey()),
+					destPath.resolve(entry.getValue()).toFile());
 			}
 		}
 	}
@@ -60,7 +61,7 @@ public class UnzipTask extends WorkflowTask {
 	@Override
 	public int getTargetProgress() throws InvalidContentException {
 		long size = 0;
-		for (ZipEntry entry : zipEntries){
+		for (ZipEntry entry : zipEntries.keySet()){
 			size += entry.getSize();
 		}
 		return (int) size;
