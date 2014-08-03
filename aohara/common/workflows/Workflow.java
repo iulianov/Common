@@ -83,10 +83,6 @@ public class Workflow extends Listenable<TaskListener> implements Runnable {
 		return name;
 	}
 	
-	public void addWorkflow(Workflow workflow){
-		tasks.addAll(workflow.tasks);
-	}
-	
 	// Tasks
 	
 	public void queueCopy(Path src, Path dest) throws MalformedURLException{
