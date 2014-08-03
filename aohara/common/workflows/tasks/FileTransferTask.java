@@ -24,6 +24,11 @@ public class FileTransferTask extends WorkflowTask {
 
 	@Override
 	public Boolean call() throws Exception {
+		// Check for file conflict
+		if (dest.toFile().isFile() && dest.toFile().exists()){
+			dest.toFile().delete();
+		}
+		
 		try (
 			InputStream is = new BufferedInputStream(input.openStream());
 			OutputStream os = new FileOutputStream(dest.toFile());
