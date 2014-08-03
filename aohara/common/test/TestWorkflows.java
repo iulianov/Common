@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 
 import aohara.common.workflows.ProgressPanel;
 import aohara.common.workflows.Workflow;
+import aohara.common.workflows.Workflows;
 
 public class TestWorkflows {
 	
@@ -16,7 +17,7 @@ public class TestWorkflows {
 		ProgressPanel panel = new ProgressPanel();
 		panel.toDialog("Foo");
 		
-		Workflow download = Workflow.tempDownload("http://download.tuxfamily.org/notepadplus/6.6.8/npp.6.6.8.Installer.exe", Paths.get("C:\\Users\\Andrew\\Downloads\\notepad.exe"));
+		Workflow download = Workflows.tempDownload("http://download.tuxfamily.org/notepadplus/6.6.8/npp.6.6.8.Installer.exe", Paths.get("C:\\Users\\Andrew\\Downloads\\notepad.exe"));
 		download.addListener(panel);
 		
 		executor.execute(download);

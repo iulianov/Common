@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class FileTransferTask extends WorkflowTask {
 	
 	private final URL input;
@@ -15,7 +17,7 @@ public class FileTransferTask extends WorkflowTask {
 	public FileTransferTask(Workflow workflow, URL input, Path dest){
 		super(workflow);
 		this.input = input;
-		this.dest = dest;
+		this.dest = groomDestinationPath(input, dest);
 	}
 
 	@Override
@@ -37,13 +39,25 @@ public class FileTransferTask extends WorkflowTask {
 	@Override
 	protected int getTargetProgress() throws InvalidContentException{
 		try {
-			int length = input.openConnection().getContentLength();
-			if (length < 1){
-				throw new Exception();
-			}
-			return length;
+			return input.openConnection().getContentLength();
 		} catch (Exception e) {
 			throw new InvalidContentException();
 		}
+	}
+	
+	public static Path groomDestinationPath(URL input, Path dest){
+		// Check if destination is a folder
+		if (dest.toFile().isDirectory()){
+			String baseName = FilenameUtils.getBaseName(input.getPath());
+	        String extension = FilenameUtils.getExtension(input.getPath());
+	        dest = dest.resolve(String.format("%s.%s", baseName, extension));
+		}
+		
+		// If dest parent does not exist, create it
+		if (!dest.getParent().toFile().exists()){
+			dest.getParent().toFile().mkdirs();
+		}
+		
+		return dest;
 	}
 }

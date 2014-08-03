@@ -83,47 +83,29 @@ public class Workflow extends Listenable<TaskListener> implements Runnable {
 		return name;
 	}
 	
-	// Task Methods
+	// Tasks
 	
-	public static Workflow copy(Path src, Path dest) throws MalformedURLException{
-		Workflow workflow = new Workflow(String.format("Copying %s to %s", src.getFileName(), dest));
-		workflow.addTask(new FileTransferTask(workflow, src.toUri().toURL(), dest));
-		return workflow;
+	public void queueCopy(Path src, Path dest) throws MalformedURLException{
+		addTask(new FileTransferTask(this, src.toUri().toURL(), dest));
 	}
 	
-	public static Workflow download(URL url, Path dest){
-		Workflow workflow = new Workflow(String.format("Downloading %s", dest.getFileName()));
-		workflow.addTask(new FileTransferTask(workflow, url, dest));
-		return workflow;
+	public void queueDelete(Path path){
+		addTask(new DeleteTask(this, path));
 	}
 	
-	public static Workflow download(String url, Path dest) throws MalformedURLException{
-		return download(new URL(url), dest);
+	public void queueDownload(URL url, Path dest){
+		addTask(new FileTransferTask(this,url, dest));
 	}
 	
-	public static Workflow delete(Path path){
-		Workflow workflow = new Workflow(String.format("Deleting %s", path));
-		workflow.addTask(new DeleteTask(workflow, path));
-		return workflow;
+	public void queueMove(Path src, Path dest) throws MalformedURLException{
+		queueCopy(src, dest);
+		queueDelete(src);;
 	}
 	
-	public static Workflow move(Path src, Path dest) throws MalformedURLException{
-		Workflow workflow = new Workflow(String.format("Moving %s to %", src.getFileName(), dest));
-		workflow.addTask(new FileTransferTask(workflow, src.toUri().toURL(), dest));
-		workflow.addTask(new DeleteTask(workflow, src));
-		return workflow;
-	}
-	
-	public static Workflow tempDownload(URL url, Path dest) throws IOException{
-		Workflow workflow = new Workflow(String.format("Downloading %s", dest.getFileName()));
+	public void queueTempDownload(URL url, Path dest) throws IOException{
 		Path temp = Files.createTempFile("download", ".temp");
-		workflow.addTask(new FileTransferTask(workflow, url, temp));
-		workflow.addTask(new FileTransferTask(workflow, temp.toUri().toURL(), dest));
-		workflow.addTask(new DeleteTask(workflow, temp));
-		return workflow;
-	}
-	
-	public static Workflow tempDownload(String url, Path dest) throws IOException {
-		return tempDownload(new URL(url), dest);
+		queueDownload(url, temp);
+		queueCopy(temp, dest);
+		queueDelete(temp);
 	}
 }
