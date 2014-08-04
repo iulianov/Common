@@ -72,7 +72,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	public void taskError(WorkflowTask task, boolean tasksRemaining, Exception e) {
 		JOptionPane.showMessageDialog(
 			panel,
-			"An error ocurred while processing:\n" + task + "\n\n" + e.getMessage(),
+			"An error ocurred while processing:\n" + task.workflow + "\n\n" + e,
 			"Error!",
 			JOptionPane.ERROR_MESSAGE
 		);

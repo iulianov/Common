@@ -20,5 +20,4 @@ public abstract class WorkflowTask implements Callable<Boolean> {
 	
 	@SuppressWarnings("serial")
 	public class InvalidContentException extends Exception {}
-
 }

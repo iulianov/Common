@@ -105,8 +105,8 @@ public class Workflow extends Listenable<TaskListener> implements Runnable {
 	
 	public void queueTempDownload(URL url, Path dest) throws IOException{
 		Path temp = Files.createTempFile("download", ".temp");
+		temp.toFile().deleteOnExit();
 		queueDownload(url, temp);
 		queueCopy(temp, dest);
-		queueDelete(temp);
 	}
 }
