@@ -38,29 +38,27 @@ public class Workflow extends Listenable<TaskListener> implements Runnable {
 		status = Status.Running;
 		
 		// Run Workflow
-		boolean result = true;
-		while(!tasks.isEmpty() && result){
-			WorkflowTask task = tasks.poll();
-			try {
+		WorkflowTask task = null;
+		boolean keepGoing = true;
+		try {
+			while(!tasks.isEmpty() && keepGoing){
+				task = tasks.poll();
 				for (TaskListener l : getListeners()){
 					l.taskStarted(task, task.getTargetProgress());
 				}
-				result = task.call();
-			} catch (Exception e) {
-				for (TaskListener l : getListeners()){
-					l.taskError(task, !tasks.isEmpty(), e);
-				}
-				result = false;
-			}
-			
-			if (result){
+				keepGoing = task.call();
 				for (TaskListener l : getListeners()){
 					l.taskComplete(task, !tasks.isEmpty());
 				}
 			}
+			status = Status.Finished;
 		}
-		
-		status = (result && tasks.isEmpty() ? Status.Finished : Status.Error);
+		catch (Exception e) { // Stop if exception occurs
+			for (TaskListener l : getListeners()){
+				l.taskError(task, !tasks.isEmpty(), e);
+			}
+			status = Status.Error;
+		}
 	}
 	
 	public void notifyProgress(WorkflowTask task, int increment){
