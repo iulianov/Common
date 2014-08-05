@@ -48,14 +48,14 @@ public class Workflow extends Listenable<TaskListener> implements Runnable {
 				}
 				keepGoing = task.call();
 				for (TaskListener l : getListeners()){
-					l.taskComplete(task, !tasks.isEmpty());
+					l.taskComplete(task, !tasks.isEmpty() && keepGoing);
 				}
 			}
 			status = Status.Finished;
 		}
 		catch (Exception e) { // Stop if exception occurs
 			for (TaskListener l : getListeners()){
-				l.taskError(task, !tasks.isEmpty(), e);
+				l.taskError(task, false, e);
 			}
 			status = Status.Error;
 		}
