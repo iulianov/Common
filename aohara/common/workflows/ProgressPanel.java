@@ -87,6 +87,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	public void toDialog(String title){
 		final JDialog dialog = new JDialog();
 		dialog.setTitle(title);
+		dialog.setResizable(false);
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
 		dialog.add(getComponent());
