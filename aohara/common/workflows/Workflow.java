@@ -15,11 +15,13 @@ import aohara.common.workflows.tasks.WorkflowTask;
 
 public class Workflow extends Listenable<TaskListener> implements Runnable {
 
-	private final Queue<WorkflowTask> tasks = new LinkedList<>();
 	public static enum Status {Ready, Running, Finished, Error};
+	
+	private final Queue<WorkflowTask> tasks = new LinkedList<>();
+	private final String name;
+	
 	private Status status = Status.Ready;
 	private int totalTasks = 0;
-	private final String name;
 	
 	public Workflow(String name){
 		this.name = name;

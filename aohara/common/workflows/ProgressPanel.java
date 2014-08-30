@@ -27,7 +27,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	public void taskStarted(WorkflowTask task, int target) {
 		JProgressBar bar = new JProgressBar();
 		bar.setMaximum(target > 0 ? target : 0);
-		bar.setIndeterminate(target < 0);
+		bar.setIndeterminate(target < 1);
 		bar.setStringPainted(true);
 		bar.setPreferredSize(new Dimension(400, 50));
 		panel.add(bar);

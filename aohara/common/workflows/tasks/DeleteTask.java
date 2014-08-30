@@ -2,6 +2,7 @@ package aohara.common.workflows.tasks;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class DeleteTask extends WorkflowTask {
 	}
 
 	@Override
-	public int getTargetProgress() throws InvalidContentException {
+	public int getTargetProgress() throws IOException {
 		int progress = 0;
 		for (File file : getFiles(path.toFile())){
 			progress += file.length();

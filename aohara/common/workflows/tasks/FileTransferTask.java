@@ -2,6 +2,7 @@ package aohara.common.workflows.tasks;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -44,12 +45,8 @@ public class FileTransferTask extends WorkflowTask {
 	}
 
 	@Override
-	public int getTargetProgress() throws InvalidContentException{
-		try {
-			return input.openConnection().getContentLength();
-		} catch (Exception e) {
-			throw new InvalidContentException();
-		}
+	public int getTargetProgress() throws IOException {
+		return input.openConnection().getContentLength();
 	}
 	
 	public static Path groomDestinationPath(URL input, Path dest){

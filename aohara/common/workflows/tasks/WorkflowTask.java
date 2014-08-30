@@ -1,5 +1,6 @@
 package aohara.common.workflows.tasks;
 
+import java.io.IOException;
 import java.util.concurrent.Callable;
 
 import aohara.common.workflows.Workflow;
@@ -16,8 +17,5 @@ public abstract class WorkflowTask implements Callable<Boolean> {
 		workflow.notifyProgress(this, increment);
 	}
 	
-	public abstract int getTargetProgress() throws InvalidContentException;
-	
-	@SuppressWarnings("serial")
-	public class InvalidContentException extends Exception {}
+	public abstract int getTargetProgress() throws IOException;
 }

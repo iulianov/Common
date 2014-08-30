@@ -59,7 +59,7 @@ public class UnzipTask extends WorkflowTask {
 	}
 
 	@Override
-	public int getTargetProgress() throws InvalidContentException {
+	public int getTargetProgress() throws IOException {
 		long size = 0;
 		for (ZipEntry entry : zipEntries.keySet()){
 			size += entry.getSize();
