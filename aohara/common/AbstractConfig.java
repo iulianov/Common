@@ -31,6 +31,10 @@ public abstract class AbstractConfig {
 		load();
 	}
 	
+	public Path getFolder(){
+		return filePath.getParent();
+	}
+	
 	protected void setLoadOnGet(boolean loadOnGet){
 		this.loadOnGet = loadOnGet;
 	}
