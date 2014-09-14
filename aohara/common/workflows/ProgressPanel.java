@@ -5,12 +5,12 @@ import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.HashMap;
 
+import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
-import thirdParty.VerticalLayout;
 import aohara.common.selectorPanel.DecoratedComponent;
 import aohara.common.workflows.tasks.WorkflowTask;
 
@@ -20,7 +20,8 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	private final HashMap<Workflow, JProgressBar> bars = new HashMap<>();
 
 	public ProgressPanel(){
-		panel.setLayout(new VerticalLayout());
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		panel.setPreferredSize(new Dimension(800, 30));
 	}
 
 	@Override
@@ -29,11 +30,11 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		bar.setMaximum(target > 0 ? target : 0);
 		bar.setIndeterminate(target < 1);
 		bar.setStringPainted(true);
-		bar.setPreferredSize(new Dimension(400, 20));
 		panel.add(bar);
 		bars.put(task.workflow, bar);
 
 		panel.setVisible(true);
+		panel.validate();
 		
 		taskProgress(task, 0);
 	}
