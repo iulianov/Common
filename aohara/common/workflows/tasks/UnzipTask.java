@@ -67,4 +67,9 @@ public class UnzipTask extends WorkflowTask {
 		return (int) size;
 	}
 
+	@Override
+	public String getTitle() {
+		return String.format("Unzipping %s", zipPath);
+	}
+
 }

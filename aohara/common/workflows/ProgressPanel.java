@@ -29,7 +29,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		bar.setMaximum(target > 0 ? target : 0);
 		bar.setIndeterminate(target < 1);
 		bar.setStringPainted(true);
-		bar.setPreferredSize(new Dimension(400, 50));
+		bar.setPreferredSize(new Dimension(400, 20));
 		panel.add(bar);
 		bars.put(task.workflow, bar);
 

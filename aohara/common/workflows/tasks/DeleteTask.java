@@ -51,4 +51,9 @@ public class DeleteTask extends WorkflowTask {
 		}
 		return progress;
 	}
+
+	@Override
+	public String getTitle() {
+		return String.format("Deleting %s", path);
+	}
 }

@@ -18,4 +18,10 @@ public abstract class WorkflowTask implements Callable<Boolean> {
 	}
 	
 	public abstract int getTargetProgress() throws IOException;
+	public abstract String getTitle();
+	
+	@Override
+	public String toString(){
+		return getTitle();
+	}
 }

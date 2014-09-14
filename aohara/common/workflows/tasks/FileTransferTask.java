@@ -64,4 +64,9 @@ public class FileTransferTask extends WorkflowTask {
 		
 		return dest;
 	}
+
+	@Override
+	public String getTitle() {
+		return String.format("Transferring to %s", dest);
+	}
 }
