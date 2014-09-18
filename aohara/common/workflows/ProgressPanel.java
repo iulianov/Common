@@ -14,6 +14,14 @@ import javax.swing.JProgressBar;
 import aohara.common.selectorPanel.DecoratedComponent;
 import aohara.common.workflows.tasks.WorkflowTask;
 
+/**
+ * Panel that is used to display the progress of various {@link aohara.common.workflows.Workflow}s.
+ * 
+ * Progress is shown with a Progress Bar and percentage progress.
+ * The name of the task is shown before the percentage.
+ * 
+ * @author Andrew O'Hara
+ */
 public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	
 	private final JPanel panel = new JPanel();

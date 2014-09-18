@@ -8,6 +8,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
+/**
+ * Abstract Configuration Manager which stores data in a JSON file.
+ * 
+ * There are several Constructors which can be used to store the file in different
+ * locations on the FS.
+ * 
+ * Most notably, the file can be easily stored in the User's Document's directory.
+ * 
+ * @author Andrew O'Hara
+ */
 public abstract class AbstractConfig {
 	
 	private final Properties props;

@@ -13,6 +13,19 @@ import aohara.common.workflows.tasks.DeleteTask;
 import aohara.common.workflows.tasks.FileTransferTask;
 import aohara.common.workflows.tasks.WorkflowTask;
 
+/**
+ * Queues Tasks for Asynchronous Execution at a later date.
+ * 
+ * Prepare by adding {aohara.common.workflows.tasks.WorkflowTask}s to it.
+ * Once all tasks are added, the workflow can be queued for execution using a
+ * built-in executor.
+ * 
+ * The workflow itself does no work.  The WorkflowTasks added to it are responsible
+ * for performaing all the work, and they are the ones that report their progress.
+ * 
+ * @author Andrew O'Hara
+ *
+ */
 public class Workflow extends Listenable<TaskListener> implements Runnable {
 
 	public static enum Status {Ready, Running, Finished, Error};

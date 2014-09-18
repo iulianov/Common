@@ -27,6 +27,18 @@ import javax.swing.event.ListSelectionListener;
 
 import aohara.common.Listenable;
 
+/**
+ * Generic Panel which includes a JList on the left, and Item View on the right.
+ * 
+ * The JList supports only Single Selection.
+ * 
+ * This Panel allows {@link aohara.common.selectorPanel.ListListener} objects to listen
+ * for list events.
+ * 
+ * @author Andrew O'Hara
+ *
+ * @param <T> The Type that is held in the JList.
+ */
 @SuppressWarnings("serial")
 public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		implements MouseListener, ListSelectionListener, SelectorInterface<T>,

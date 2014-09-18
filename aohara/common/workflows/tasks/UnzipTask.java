@@ -13,6 +13,11 @@ import aohara.common.workflows.ConflictResolver;
 import aohara.common.workflows.ConflictResolver.Resolution;
 import aohara.common.workflows.Workflow;
 
+/**
+ * WorkflowTask to extract selected files from a Zip File.
+ * 
+ * @author Andrew O'Hara
+ */
 public class UnzipTask extends WorkflowTask {
 	
 	private final Path zipPath, destPath;

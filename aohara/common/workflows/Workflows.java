@@ -5,6 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 
+/**
+ * Factory for creating some pre-defined, standard workflows with tasks.
+ */
 public final class Workflows {
 	
 	public static Workflow copy(Path src, Path dest) throws MalformedURLException{

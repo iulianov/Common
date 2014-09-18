@@ -12,6 +12,11 @@ import org.apache.commons.io.FilenameUtils;
 
 import aohara.common.workflows.Workflow;
 
+/**
+ * WorkflowTask to transfer the file from the given URL to the given path location.
+ * 
+ * @author Andrew O'Hara
+ */
 public class FileTransferTask extends WorkflowTask {
 	
 	private final URL input;

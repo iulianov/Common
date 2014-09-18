@@ -2,6 +2,14 @@ package aohara.common.workflows;
 
 import aohara.common.workflows.tasks.WorkflowTask;
 
+/**
+ * Listens to events from {aohara.common.workflows.tasks.WorkflowTask}s.
+ * 
+ * Add the implementing listener to the {aohara.common.workflows.Workflow} to receive
+ * events from all the tasks it holds.
+ * 
+ * @author Andrew O'Hara
+ */
 public interface TaskListener {
 	
 	public void taskStarted(WorkflowTask task, int targetProgress);

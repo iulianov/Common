@@ -9,6 +9,11 @@ import java.util.List;
 
 import aohara.common.workflows.Workflow;
 
+/**
+ * WorkflowTask to delete the given file.
+ * 
+ * @author Andrew O'Hara
+ */
 public class DeleteTask extends WorkflowTask {
 
 	private final Path path;
