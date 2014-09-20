@@ -63,7 +63,7 @@ public class FileTransferTask extends WorkflowTask {
 		}
 		
 		// If dest parent does not exist, create it
-		if (!dest.getParent().toFile().exists()){
+		if (dest.getParent() != null && !dest.getParent().toFile().exists()){
 			dest.getParent().toFile().mkdirs();
 		}
 		
