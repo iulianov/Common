@@ -19,8 +19,9 @@ import aohara.common.workflows.Workflow;
  */
 public class FileTransferTask extends WorkflowTask {
 	
+	public static final float REPORT_PER_PERCENT = (float) 0.01;
 	private final URL input;
-	private final Path dest;
+	private final Path dest;	
 	
 	public FileTransferTask(Workflow workflow, URL input, Path dest){
 		super(workflow);
@@ -39,11 +40,17 @@ public class FileTransferTask extends WorkflowTask {
 			InputStream is = new BufferedInputStream(input.openStream());
 			OutputStream os = new FileOutputStream(dest.toFile());
 		){
+			float contentLength = getTargetProgress();
 			byte[] buf = new byte[1024];
-			int bytesRead;
+			int bytesRead, currentBunch = 0;
+			
 			while ((bytesRead = is.read(buf)) > 0) {
 				os.write(buf, 0, bytesRead);
-				progress(bytesRead);
+				currentBunch += bytesRead;
+				if (currentBunch / contentLength >= REPORT_PER_PERCENT){
+					progress(currentBunch);
+					currentBunch = 0;
+				}
 			}
 		}
 		return true;
