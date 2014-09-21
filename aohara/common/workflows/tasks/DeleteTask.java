@@ -27,7 +27,7 @@ public class DeleteTask extends WorkflowTask {
 	public Boolean call() throws FileNotFoundException {
 		for (File file : getFiles(path.toFile())){
 			int size = (int) file.length();
-			if (!file.delete()) {
+			if (file.exists() && !file.delete()) {
 				throw new FileNotFoundException("Failed to delete file: " + path.toFile());
 			}
 			progress(size);

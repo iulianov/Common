@@ -55,10 +55,10 @@ public class UnzipTask extends WorkflowTask {
 	
 	private void unzip() throws IOException {
 		try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
-			for (Entry<ZipEntry, Path> entry : zipEntries.entrySet()) {
+			for (Entry<ZipEntry, Path> mapping : zipEntries.entrySet()) {
 				FileUtils.copyInputStreamToFile(
-					zipFile.getInputStream(entry.getKey()),
-					destPath.resolve(entry.getValue()).toFile());
+					zipFile.getInputStream(mapping.getKey()),
+					destPath.resolve(mapping.getValue()).toFile());
 			}
 		}
 	}

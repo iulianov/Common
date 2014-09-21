@@ -155,6 +155,7 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 			try {
 				l.elementClicked(list.getSelectedValue(), evt.getClickCount());
 			} catch (Exception e) {
+				e.printStackTrace();
 				errorMessage(e.getMessage());
 			}
 		}
