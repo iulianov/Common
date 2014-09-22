@@ -31,29 +31,35 @@ public class FileTransferTask extends WorkflowTask {
 
 	@Override
 	public Boolean call() throws Exception {
+		transferFile(this, input, dest);
+		return true;
+	}
+	
+	public static void transferFile(WorkflowTask task, URL input, Path dest) throws IOException{
 		// Check for file conflict
 		if (dest.toFile().isFile() && dest.toFile().exists()){
 			dest.toFile().delete();
+		} else if (!dest.getParent().toFile().exists()){
+			dest.getParent().toFile().mkdirs();
 		}
 		
 		try (
-			InputStream is = new BufferedInputStream(input.openStream());
-			OutputStream os = new FileOutputStream(dest.toFile());
-		){
-			float contentLength = getTargetProgress();
-			byte[] buf = new byte[1024];
-			int bytesRead, currentBunch = 0;
-			
-			while ((bytesRead = is.read(buf)) > 0) {
-				os.write(buf, 0, bytesRead);
-				currentBunch += bytesRead;
-				if (currentBunch / contentLength >= REPORT_PER_PERCENT){
-					progress(currentBunch);
-					currentBunch = 0;
+				InputStream is = new BufferedInputStream(input.openStream());
+				OutputStream os = new FileOutputStream(dest.toFile());
+			){
+				float contentLength = task.getTargetProgress();
+				byte[] buf = new byte[1024];
+				int bytesRead, currentBunch = 0;
+				
+				while ((bytesRead = is.read(buf)) > 0) {
+					os.write(buf, 0, bytesRead);
+					currentBunch += bytesRead;
+					if (currentBunch / contentLength >= REPORT_PER_PERCENT){
+						task.progress(currentBunch);
+						currentBunch = 0;
+					}
 				}
 			}
-		}
-		return true;
 	}
 
 	@Override
