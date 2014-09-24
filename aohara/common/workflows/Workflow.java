@@ -1,16 +1,9 @@
 package aohara.common.workflows;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.Queue;
 
 import aohara.common.Listenable;
-import aohara.common.workflows.tasks.DeleteTask;
-import aohara.common.workflows.tasks.FileTransferTask;
 import aohara.common.workflows.tasks.WorkflowTask;
 
 /**
@@ -97,31 +90,5 @@ public class Workflow extends Listenable<TaskListener> implements Runnable {
 	@Override
 	public String toString(){
 		return name;
-	}
-	
-	// Tasks
-	
-	public void queueCopy(Path src, Path dest) throws MalformedURLException{
-		addTask(new FileTransferTask(this, src.toUri().toURL(), dest));
-	}
-	
-	public void queueDelete(Path path){
-		addTask(new DeleteTask(this, path));
-	}
-	
-	public void queueDownload(URL url, Path dest){
-		addTask(new FileTransferTask(this,url, dest));
-	}
-	
-	public void queueMove(Path src, Path dest) throws MalformedURLException{
-		queueCopy(src, dest);
-		queueDelete(src);;
-	}
-	
-	public void queueTempDownload(URL url, Path dest) throws IOException{
-		Path temp = Files.createTempFile("download", ".temp");
-		temp.toFile().deleteOnExit();
-		queueDownload(url, temp);
-		queueCopy(temp, dest);
 	}
 }

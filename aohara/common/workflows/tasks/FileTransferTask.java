@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import org.apache.commons.io.FilenameUtils;
 
 import aohara.common.workflows.Workflow;
+import aohara.common.workflows.tasks.path.DefaultPathGen;
+import aohara.common.workflows.tasks.path.PathGen;
 
 /**
  * WorkflowTask to transfer the file from the given URL to the given path location.
@@ -21,17 +23,21 @@ public class FileTransferTask extends WorkflowTask {
 	
 	public static final float REPORT_PER_PERCENT = (float) 0.01;
 	private final URL input;
-	private final Path dest;	
+	private final PathGen pathFunc;
 	
-	public FileTransferTask(Workflow workflow, URL input, Path dest){
+	public FileTransferTask(Workflow workflow, URL input, PathGen pathFunc){
 		super(workflow);
 		this.input = input;
-		this.dest = groomDestinationPath(input, dest);
+		this.pathFunc = pathFunc;
+	}
+	
+	public FileTransferTask(Workflow workflow, URL input, Path dest){
+		this(workflow, input, new DefaultPathGen(groomDestinationPath(input, dest)));
 	}
 
 	@Override
 	public Boolean call() throws Exception {
-		transferFile(this, input, dest);
+		transferFile(this, input, pathFunc.getPath());
 		return true;
 	}
 	
@@ -85,6 +91,6 @@ public class FileTransferTask extends WorkflowTask {
 
 	@Override
 	public String getTitle() {
-		return String.format("Transferring to %s", dest);
+		return String.format("Transferring to %s", pathFunc.getPath());
 	}
 }

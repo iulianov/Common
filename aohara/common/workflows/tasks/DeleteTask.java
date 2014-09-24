@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import aohara.common.workflows.Workflow;
+import aohara.common.workflows.tasks.path.DefaultPathGen;
+import aohara.common.workflows.tasks.path.PathGen;
 
 /**
  * WorkflowTask to delete the given file.
@@ -16,15 +18,20 @@ import aohara.common.workflows.Workflow;
  */
 public class DeleteTask extends WorkflowTask {
 
-	private final Path path;
+	private final PathGen pathGen;
 
-	public DeleteTask(Workflow workflow, Path path) {
+	public DeleteTask(Workflow workflow, PathGen pathGen) {
 		super(workflow);
-		this.path = path;
+		this.pathGen = pathGen;
+	}
+	
+	public DeleteTask(Workflow workflow, Path path) {
+		this(workflow, new DefaultPathGen(path));
 	}
 
 	@Override
 	public Boolean call() throws FileNotFoundException {
+		Path path = pathGen.getPath();
 		for (File file : getFiles(path.toFile())){
 			int size = (int) file.length();
 			if (file.exists() && !file.delete()) {
@@ -51,7 +58,7 @@ public class DeleteTask extends WorkflowTask {
 	@Override
 	public int getTargetProgress() throws IOException {
 		int progress = 0;
-		for (File file : getFiles(path.toFile())){
+		for (File file : getFiles(pathGen.getFile())){
 			progress += file.length();
 		}
 		return progress;
@@ -59,6 +66,6 @@ public class DeleteTask extends WorkflowTask {
 
 	@Override
 	public String getTitle() {
-		return String.format("Deleting %s", path);
+		return String.format("Deleting %s", pathGen.getFile());
 	}
 }
