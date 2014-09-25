@@ -5,8 +5,6 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.io.FilenameUtils;
-
 import aohara.common.workflows.tasks.DeleteTask;
 import aohara.common.workflows.tasks.FileTransferTask;
 import aohara.common.workflows.tasks.gen.GenFactory;
@@ -42,7 +40,7 @@ public final class WorkflowBuilder {
 	}
 	
 	public static Path downloadToTemp(Workflow workflow, URLGen url) throws IOException {
-		Path temp = Files.createTempFile(FilenameUtils.getBaseName(url.getURL().getPath()), ".tempDownload");
+		Path temp = Files.createTempFile("download", ".tempDownload");
 		temp.toFile().deleteOnExit();
 		download(workflow, url, GenFactory.fromPath(temp));
 		return temp;
