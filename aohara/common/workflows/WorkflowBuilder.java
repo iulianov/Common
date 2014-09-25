@@ -33,12 +33,12 @@ public final class WorkflowBuilder {
 	
 	public static void move(Workflow workflow, PathGen src, PathGen dest) throws MalformedURLException{
 		copy(workflow, src, dest);
-		delete(workflow, dest);
+		delete(workflow, src);
 	}
 	
 	public static void tempDownload(Workflow workflow, URLGen url, PathGen destGen) throws IOException{
 		Path temp = downloadToTemp(workflow, url);
-		move(workflow, GenFactory.fromPath(temp), destGen);
+		copy(workflow, GenFactory.fromPath(temp), destGen);
 	}
 	
 	public static Path downloadToTemp(Workflow workflow, URLGen url) throws IOException {
