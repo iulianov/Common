@@ -19,7 +19,7 @@ import aohara.common.workflows.tasks.WorkflowTask;
  * @author Andrew O'Hara
  *
  */
-public class Workflow extends Listenable<TaskListener> implements Runnable {
+public final class Workflow extends Listenable<TaskListener> implements Runnable {
 
 	public static enum Status {Ready, Running, Finished, Error};
 	
