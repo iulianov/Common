@@ -5,13 +5,13 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import thirdParty.SortedListModel;
 import aohara.common.Listenable;
 
 /**
@@ -45,12 +46,14 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		DecoratedComponent<JComponent> {
 	
 	private final JSplitPane splitPane = new SelectorSplitPane();
-	private final JList<T> list = new JList<T>(new DefaultListModel<T>());
+	private final JList<T> list;
 	private Collection<T> elements = new HashSet<>();
 	private final Collection<SelectorView<T, JPanel>> views = new ArrayList<>(); 
 	private JScrollPane scrollPane;
 
-	public SelectorPanel(SelectorView<T, JPanel> view){
+	public SelectorPanel(SelectorView<T, JPanel> view, Comparator<T> comparator){
+		list = new JList<T>(new SortedListModel<T>(comparator));
+		
 		views.add(view);
 		
 		// Configure List
@@ -210,18 +213,16 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		@Override
 		public void run() {
 			synchronized(list){
-				DefaultListModel<T> model = (DefaultListModel<T>) list.getModel();
+				SortedListModel<T> model = (SortedListModel<T>) list.getModel();
 				
 				T selected = list.getSelectedValue();
 				
-				Object[] arr = new Object[model.getSize()];
-				model.copyInto(arr);
-				HashSet<Object> set = new HashSet<>(Arrays.asList(arr));
+				Set<T> set = model.getElements();
 				
 				if (!set.equals(elements)){
-					model.removeAllElements();
+					model.clear();
 					for (T ele : elements){
-						model.addElement(ele);
+						model.add(ele);
 					}
 					
 					if (selected == null && !elements.isEmpty()){
