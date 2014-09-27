@@ -7,10 +7,6 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.JComponent;
 import javax.swing.JList;
@@ -47,7 +43,6 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	
 	private final JSplitPane splitPane = new SelectorSplitPane();
 	private final JList<T> list;
-	private Collection<T> elements = new HashSet<>();
 	private final Collection<SelectorView<T, JPanel>> views = new ArrayList<>(); 
 	private JScrollPane scrollPane;
 
@@ -64,10 +59,6 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		// Add Componenents to JSplitPane
 		splitPane.setLeftComponent(createSidePanel(list, new Dimension(180, 700)));
 		splitPane.setRightComponent(createSidePanel(view.getComponent(), new Dimension(620, 700)));
-		
-		// Start List Model Update Timer
-		Timer timer = new Timer(true);
-		timer.scheduleAtFixedRate(new UpdateTask(), 0, 1000);
 	}
 	
 	private JPanel createSidePanel(JComponent comp, Dimension preferredSize){
@@ -89,11 +80,23 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		return sidePanel;
 	}
 	
+	private SortedListModel<T> getModel(){
+		return (SortedListModel<T>) list.getModel();
+	}
+	
 	@Override
-	public void setDataSource(Collection<T> newElements){
-		synchronized(list){
-			elements = newElements;
-		}
+	public void addElement(T element) {
+		getModel().add(element);
+	}
+
+	@Override
+	public void removeElement(T element) {
+		getModel().removeElement(element);
+	}
+	
+	@Override
+	public void clear() {
+		getModel().clear();
 	}
 	
 	@Override
@@ -202,35 +205,6 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 			/**Overridden to prevent view update during model update **/
 			synchronized(list){
 				super.paintComponent(g);
-			}
-		}
-	}
-	
-	// -- ListModel Update Task ---------------------------------------
-	
-	private class UpdateTask extends TimerTask {
-
-		@Override
-		public void run() {
-			synchronized(list){
-				SortedListModel<T> model = (SortedListModel<T>) list.getModel();
-				
-				T selected = list.getSelectedValue();
-				
-				Set<T> set = model.getElements();
-				
-				if (!set.equals(elements)){
-					model.clear();
-					for (T ele : elements){
-						model.add(ele);
-					}
-					
-					if (selected == null && !elements.isEmpty()){
-						selectIndex(0);
-					} else {
-						selectElement(selected);
-					}
-				}
 			}
 		}
 	}
