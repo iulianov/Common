@@ -49,7 +49,7 @@ public abstract class AbstractConfig {
 		this.loadOnGet = loadOnGet;
 	}
 	
-	protected void setProperty(String key, String value){
+	public void setProperty(String key, String value){
 		props.setProperty(key, value);
 		save();
 	}
@@ -88,4 +88,6 @@ public abstract class AbstractConfig {
 			e.printStackTrace();
 		}
 	}
+	
+	public abstract void verifyConfig();
 }
