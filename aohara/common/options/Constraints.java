@@ -36,10 +36,9 @@ public class Constraints {
 
 		@Override
 		public void check(String value) throws InvalidInputException {
-			if (value == null){
-				throw new IllegalArgumentException(name + " must be non-null");
+			if (value == null || value.toString().isEmpty()){
+				throw new InvalidInputException(name + " must be non-null");
 			}
-			
 		}
 	}
 	
@@ -75,11 +74,11 @@ public class Constraints {
 		}
 	}
 	
-	public static class EnsureFile extends Constraint {
+	public static class EnsurePathExists extends Constraint {
 		
 		private final boolean mustExist;
 
-		public EnsureFile(Option option, boolean mustExist) {
+		public EnsurePathExists(Option option, boolean mustExist) {
 			super(option);
 			this.mustExist = mustExist;
 		}
@@ -87,8 +86,8 @@ public class Constraints {
 		@Override
 		public void check(String value) throws InvalidInputException {
 			File file = new File(value);
-			if (!file.isFile()){
-				throw new InvalidInputException(file + " must be a file.");
+			if (!file.isFile() && !file.isDirectory()){
+				throw new InvalidInputException(file + " must be a valid path.");
 			} else if (mustExist && !file.exists()){
 				throw new InvalidInputException(file + " must exist");
 			}

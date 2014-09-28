@@ -110,7 +110,9 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 			
 			// Create File Chooser
 			final JFileChooser chooser = new JFileChooser();
-			chooser.setSelectedFile(new File(option.getValue()));
+			if (option.getValue() != null){
+				chooser.setSelectedFile(new File(option.getValue()));
+			}
 			chooser.setDialogTitle("Choose path");
 			chooser.setApproveButtonText("Select KSP Path");
 			chooser.setFileSelectionMode(fileSelectionMode);
