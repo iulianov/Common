@@ -57,7 +57,7 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		list.addMouseListener(this);
 		
 		// Add Componenents to JSplitPane
-		splitPane.setLeftComponent(createSidePanel(list, new Dimension(180, 700)));
+		splitPane.setLeftComponent(createSidePanel(list, new Dimension(200, 700)));
 		splitPane.setRightComponent(createSidePanel(view.getComponent(), new Dimension(620, 700)));
 	}
 	
