@@ -1,6 +1,7 @@
 package aohara.common.selectorPanel;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -45,6 +47,7 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	private final JList<T> list;
 	private final Collection<SelectorView<T, JPanel>> views = new ArrayList<>(); 
 	private JScrollPane scrollPane;
+	private JPopupMenu popupMenu;
 
 	public SelectorPanel(SelectorView<T, JPanel> view, Comparator<T> comparator){
 		list = new JList<T>(new SortedListModel<T>(comparator));
@@ -78,6 +81,10 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		sidePanel.add(controlPanel.getComponent(), BorderLayout.SOUTH);
 		views.add(controlPanel);
 		return sidePanel;
+	}
+	
+	public void addPopupMenu(JPopupMenu popupMenu){
+		this.popupMenu = popupMenu;
 	}
 	
 	private SortedListModel<T> getModel(){
@@ -168,12 +175,10 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		
 		if (SwingUtilities.isRightMouseButton(evt)){
 			selectIndex(list.locationToIndex(evt.getPoint()));
-			 for (ListListener<T> l : getListeners()){
-				 try {
-					l.elementRightClicked(evt, list.getSelectedValue());
-				} catch (Exception e) {
-					errorMessage(e.getMessage());
-				}
+			 
+			 // Open Popup Menu
+			 if (popupMenu != null){
+				 popupMenu.show((Component) evt.getSource(), evt.getX(), evt.getY());
 			 }
 		}
     }
