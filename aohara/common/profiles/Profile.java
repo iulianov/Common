@@ -19,6 +19,16 @@ public abstract class Profile {
 		}
 		return false;
 	}
+	
+	@Override
+	public int hashCode(){
+		return entrySet().hashCode() + name.hashCode();
+	}
+	
+	@Override
+	public String toString(){
+		return "Profile : " + name;
+	}
 		
 	public abstract String getProperty(String key);
 	public abstract boolean hasProperty(String key);

@@ -46,11 +46,12 @@ public class ProfileManager {
 	
 	public Profile getProfile(String name){
 		JsonObject obj = findProfile(name);
-		obj.remove(Profile.NAME);
 		
 		Profile profile = new MapProfile(name);
 		for (Entry<String, JsonElement> entry : obj.entrySet()){
-			profile.putProperty(entry.getKey(), entry.getValue().getAsString());
+			if (!entry.getKey().equals(Profile.NAME)){
+				profile.putProperty(entry.getKey(), entry.getValue().getAsString());
+			}
 		}
 		return profile;
 	}
@@ -66,12 +67,14 @@ public class ProfileManager {
 	}
 	
 	public Profile saveProfile(Profile profile){
-		JsonArray json = load();
 		if(hasProfile(profile.name)){
 			deleteProfile(profile);
 		}
+		
+		JsonArray json = load();
 		json.add(profileToJson(profile));
 		save(json);
+		cached = json;
 		return profile;
 	}
 	
