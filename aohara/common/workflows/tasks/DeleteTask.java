@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
-import aohara.common.workflows.Workflow;
+import aohara.common.workflows.Workflow.WorkflowTask;
 import aohara.common.workflows.tasks.gen.PathGen;
 
 /**
@@ -19,8 +19,7 @@ public class DeleteTask extends WorkflowTask {
 
 	private final PathGen pathGen;
 
-	public DeleteTask(Workflow workflow, PathGen pathGen) {
-		super(workflow);
+	public DeleteTask(PathGen pathGen) {
 		this.pathGen = pathGen;
 	}
 

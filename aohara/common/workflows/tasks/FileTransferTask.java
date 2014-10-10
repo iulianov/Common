@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.io.FilenameUtils;
 
-import aohara.common.workflows.Workflow;
+import aohara.common.workflows.Workflow.WorkflowTask;
 import aohara.common.workflows.tasks.gen.PathGen;
 import aohara.common.workflows.tasks.gen.URIGen;
 
@@ -24,8 +24,7 @@ public class FileTransferTask extends WorkflowTask {
 	public static final float REPORT_PER_PERCENT = (float) 0.01;
 	private final URIGen srcGen, destGen;
 	
-	public FileTransferTask(Workflow workflow, URIGen src, PathGen dest){
-		super(workflow);
+	public FileTransferTask(URIGen src, PathGen dest){
 		this.srcGen = src;
 		this.destGen = dest;
 	}

@@ -11,7 +11,7 @@ import org.apache.commons.io.FileUtils;
 
 import aohara.common.workflows.ConflictResolver;
 import aohara.common.workflows.ConflictResolver.Resolution;
-import aohara.common.workflows.Workflow;
+import aohara.common.workflows.Workflow.WorkflowTask;
 
 /**
  * WorkflowTask to extract selected files from a Zip File.
@@ -24,10 +24,7 @@ public class UnzipTask extends WorkflowTask {
 	private final Map<ZipEntry, Path> zipEntries;
 	private final ConflictResolver cr;
 	
-	public UnzipTask(
-			Workflow workflow, Path zipPath, Path destPath,
-			Map<ZipEntry, Path> zipEntries, ConflictResolver cr){
-		super(workflow);
+	public UnzipTask(Path zipPath, Path destPath, Map<ZipEntry, Path> zipEntries, ConflictResolver cr){
 		this.zipPath = zipPath;
 		this.destPath = destPath;
 		this.zipEntries = zipEntries;

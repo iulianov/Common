@@ -4,7 +4,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Executor;
 
+import aohara.common.workflows.Workflow.WorkflowTask;
+import aohara.common.workflows.tasks.BrowserGoToTask;
 import aohara.common.workflows.tasks.DeleteTask;
 import aohara.common.workflows.tasks.FileTransferTask;
 import aohara.common.workflows.tasks.gen.GenFactory;
@@ -15,34 +20,69 @@ import aohara.common.workflows.tasks.gen.URLGen;
 /**
  * Class with methods for adding standard tasks to a Workflow
  */
-public final class WorkflowBuilder {
+public class WorkflowBuilder {
 	
-	public static void copy(Workflow workflow, URIGen src, PathGen path) throws MalformedURLException{
-		download(workflow, src, path);
+	private final String workflowName;
+	private final List<WorkflowTask> tasks = new LinkedList<>();
+	private final List<TaskListener> listeners = new LinkedList<>();
+	
+	public WorkflowBuilder(String workflowName){
+		this.workflowName = workflowName;
 	}
 	
-	public static void download(Workflow workflow, URIGen src, PathGen path){
-		workflow.addTask(new FileTransferTask(workflow, src, path));
+	public void copy(URIGen src, PathGen path) throws MalformedURLException{
+		download(src, path);
+	}
+	
+	public void download(URIGen src, PathGen path){
+		addTask(new FileTransferTask(src, path));
 	}
 
-	public static void delete(Workflow workflow, PathGen pathGen){
-		workflow.addTask(new DeleteTask(workflow, pathGen));
+	public void delete(PathGen pathGen){
+		addTask(new DeleteTask(pathGen));
 	}
 	
-	public static void move(Workflow workflow, PathGen src, PathGen dest) throws MalformedURLException{
-		copy(workflow, src, dest);
-		delete(workflow, src);
+	public void move(PathGen src, PathGen dest) throws MalformedURLException{
+		copy(src, dest);
+		delete(src);
 	}
 	
-	public static void tempDownload(Workflow workflow, URLGen url, PathGen destGen) throws IOException{
-		Path temp = downloadToTemp(workflow, url);
-		copy(workflow, GenFactory.fromPath(temp), destGen);
+	public void tempDownload(URLGen url, PathGen destGen) throws IOException{
+		Path temp = downloadToTemp(url);
+		copy(GenFactory.fromPath(temp), destGen);
 	}
 	
-	public static Path downloadToTemp(Workflow workflow, URLGen url) throws IOException {
+	public Path downloadToTemp(URLGen url) throws IOException {
 		Path temp = Files.createTempFile("download", ".tempDownload");
 		temp.toFile().deleteOnExit();
-		download(workflow, url, GenFactory.fromPath(temp));
+		download(url, GenFactory.fromPath(temp));
 		return temp;
+	}
+	
+	public void browserGoTo(URLGen dest){
+		addTask(new BrowserGoToTask(dest));
+	}
+	
+	public void addTask(WorkflowTask task){
+		tasks.add(task);
+	}
+	
+	public void addListener(TaskListener listener){
+		listeners.add(listener);
+	}
+	
+	public Workflow buildWorkflow(){
+		Workflow workflow = new Workflow(workflowName);
+		for (WorkflowTask task : tasks){
+			workflow.addTask(task);
+		}
+		for (TaskListener l : listeners){
+			workflow.addListener(l);
+		}
+		return workflow;
+	}
+	
+	public void execute(Executor executor){
+		executor.execute(buildWorkflow());
 	}
 }
