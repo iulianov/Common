@@ -1,12 +1,13 @@
 package thirdParty;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -25,7 +26,7 @@ public class ZipNode {
 
 	private final ZipEntry entry; // the corresponding Zip entry. If null, this
 									// is the root entry
-	private final ZipFile file; // the ZipFile from where the nodes came
+	public final ZipFile file; // the ZipFile from where the nodes came
 
 	private ZipNode(ZipFile f, ZipEntry entry) {
 		this.file = f;
@@ -61,7 +62,6 @@ public class ZipNode {
 		return thisPath;
 	}
 	
-	
 	/**
 	 * gets the corresponding ZipEntry to this node.
 	 * 
@@ -74,9 +74,10 @@ public class ZipNode {
 
 	/**
 	 * Gets the ZipFile, from where this ZipNode came.
+	 * @throws IOException 
 	 */
-	public ZipFile getZipFile() {
-		return file;
+	public ZipFile reopenZipFile() throws IOException {
+		return new ZipFile(file.getName());
 	}
 
 	/**
@@ -101,20 +102,27 @@ public class ZipNode {
 	public Map<String, ZipNode> getChildren() {
 		return Collections.unmodifiableMap(children);
 	}
-
-	/**
-	 * opens an InputStream on this ZipNode. This only works when this is not a
-	 * directory node, and only before the corresponding ZipFile is closed.
-	 */
-	public InputStream openStream() throws IOException {
-		return file.getInputStream(entry);
-	}
-
+	
 	/**
 	 * a string representation of this ZipNode.
 	 */
 	public String toString() {
 		return "ZipNode [" + entry.getName() + "] in [" + file.getName() + "]";
+	}
+	
+	public Set<ZipNode> getAllChildren(){
+		Set<ZipNode> children = new HashSet<>();
+		for (ZipNode child : getChildren().values()){
+			addChildren(children, child);
+		}
+		return children;
+	}
+	
+	private void addChildren(Set<ZipNode> nodes, ZipNode node){
+		nodes.add(node);
+		for (ZipNode child : node.getChildren().values()){
+			addChildren(nodes, child);
+		}
 	}
 
 	/**
