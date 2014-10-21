@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.io.FilenameUtils;
@@ -31,6 +32,11 @@ public class FileTransferTask extends WorkflowTask {
 
 	@Override
 	public Boolean call() throws Exception {
+		// Do not download if no input was specified
+		if (srcGen.getURI() == null){
+			return true;
+		}
+		
 		File destFile = new File(destGen.getURI());
 		
 		// Check if destination is a folder
@@ -84,7 +90,8 @@ public class FileTransferTask extends WorkflowTask {
 	@Override
 	public int getTargetProgress() throws IOException {
 		try {
-			return srcGen.getURI().toURL().openConnection().getContentLength();
+			URI uri = srcGen.getURI();
+			return uri != null ? uri.toURL().openConnection().getContentLength() : -1;
 		} catch (URISyntaxException e) {
 			throw new IOException(e);
 		}
