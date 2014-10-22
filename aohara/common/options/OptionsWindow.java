@@ -2,7 +2,7 @@ package aohara.common.options;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -19,15 +19,15 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 	
 	private final JPanel panel = new JPanel();
 	private JDialog dialog;
-	private final Set<OptionInput> optionInputs;
+	private final Collection<OptionInput> optionInputs;
 	private final String title;
 	private final boolean restartOnSuccess, exitOnCancel;
 	
-	public OptionsWindow(String title, Set<OptionInput> optionInputs){
+	public OptionsWindow(String title, Collection<OptionInput> optionInputs){
 		this(title, optionInputs, false, false);
 	}
 	
-	public OptionsWindow(String title, Set<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
+	public OptionsWindow(String title, Collection<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
 		this.title = title;
 		this.optionInputs = optionInputs;
 		this.restartOnSuccess = restartOnSuccess;
@@ -128,9 +128,6 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 					System.exit(1);
 				}
 			}
-		}
-		
-		
+		}	
 	}
-
 }
