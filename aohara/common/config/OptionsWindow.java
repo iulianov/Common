@@ -1,4 +1,4 @@
-package aohara.common.options;
+package aohara.common.config;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import aohara.common.options.Constraint.InvalidInputException;
+import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
 
 public class OptionsWindow implements DecoratedComponent<JPanel>{
@@ -39,6 +39,7 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 		for (OptionInput input : optionInputs){
 			panel.add(new JLabel(String.format("<html><b>%s</b></html>", input.getName())));
 			panel.add(input.getComponent());
+			input.update(); // Get Value from option and place in component
 			
 		}
 		panel.add(new JButton(new SubmitAction()));

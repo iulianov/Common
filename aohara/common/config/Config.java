@@ -5,20 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 
-import aohara.common.options.Constraint.InvalidInputException;
-import aohara.common.options.Option;
-import aohara.common.options.OptionInput;
-import aohara.common.options.OptionsWindow;
+import aohara.common.config.Constraint.InvalidInputException;
 
 /**
  * Abstract Configuration Manager which stores data in a properties file.
  * 
  * @author Andrew O'Hara
  */
-public abstract class Config {
+public class Config {
 	
 	private final Map<Option, OptionInput> options;
 	private final Path filePath;
@@ -26,6 +25,11 @@ public abstract class Config {
 	public Config(Path filePath, Map<Option, OptionInput> options){
 		if (!filePath.toFile().isFile()){
 			throw new IllegalArgumentException("filePath must be a file");
+		}
+		
+		// Bind Options to this config
+		for (Option option : options.keySet()){
+			option.setConfig(this);
 		}
 		
 		this.filePath = filePath;
@@ -58,6 +62,14 @@ public abstract class Config {
 		return load().containsKey(key);
 	}
 	
+	public Collection<String> keySet(){
+		Collection<String> keys = new LinkedList<>();
+		for (Option option : options.keySet()){
+			keys.add(option.name);
+		}
+		return keys;
+	}
+	
 	private Properties load(){
 		Properties props = new Properties();
 		try(FileInputStream is = new FileInputStream(filePath.toFile())){
@@ -82,6 +94,6 @@ public abstract class Config {
 	}
 	
 	public void openOptionsWindow(boolean restartOnSuccess, boolean exitOnCancel){
-		new OptionsWindow("Options", options.values(), restartOnSuccess, exitOnCancel).getComponent().setVisible(true);
+		new OptionsWindow("Options", options.values(), restartOnSuccess, exitOnCancel).toDialog();
 	}
 }

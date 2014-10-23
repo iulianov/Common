@@ -1,4 +1,4 @@
-package aohara.common.options;
+package aohara.common.config;
 
 public abstract class Constraint {
 	
