@@ -94,7 +94,7 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 		
 		private final JFileChooser chooser = new JFileChooser();
 		private final JPanel panel = new JPanel(new BorderLayout());
-		private final JTextField pathField = new JTextField(option.getValue());
+		private final JTextField pathField = new JTextField();
 
 		public FileChooserInput(Option option, int fileSelectionMode) {
 			super(option);

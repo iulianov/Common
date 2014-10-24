@@ -10,7 +10,7 @@ public class TestOptionsWindow {
 
 	public static void main(String[] args) throws IOException{
 		ConfigBuilder builder = new ConfigBuilder();
-		builder.addIntProperty("age", 22, 0, null);
+		builder.addIntProperty("age", 22, 0, null, false);
 		builder.addTrueFalseProperty("Human", null, false);
 		
 		Config config = builder.createConfig(Files.createTempFile("temp", ".properties"));

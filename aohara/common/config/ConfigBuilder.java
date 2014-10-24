@@ -15,25 +15,26 @@ public class ConfigBuilder {
 	private final Map<Option, OptionInput> options = new LinkedHashMap<>();
 	private final Map<Option, String> defaults = new LinkedHashMap<>();
 	
-	private void addProperty(Option option, OptionInput input, String defaultValue, Constraint... constraints){
-		options.put(option, input);
-		defaults.put(option, defaultValue);
-		
+	private void addProperty(Option option, OptionInput input, String defaultValue, boolean allowNone, Constraint... constraints){
+		// Add Constraints
+		if (!allowNone){
+			option.addConstraint(new Constraints.NotNull(option));
+		}
 		for (Constraint c : constraints){
 			option.addConstraint(c);
 		}
+		
+		options.put(option, input);
+		defaults.put(option, defaultValue);
 	}
 	
 	public void addMultiProperty(String name, Collection<String> choices, String defaultValue, boolean allowNone){
 		Option option = new Option(name);
-		if (!allowNone){
-			option.addConstraint(new Constraints.NotNull(option));
-		}
-		
 		addProperty(
 			option,
 			new OptionInput.ComboBoxInput(option, choices),
-			defaultValue
+			defaultValue,
+			allowNone
 		);
 	}
 	
@@ -47,27 +48,29 @@ public class ConfigBuilder {
 	}
 	
 	public void addPathProperty(String name, int fileSelectionMode, Path defaultPath, boolean allowNone){
-		Option option = new Option(name);
+		Option option = new Option(name);		
 		addProperty(
 			option,
 			new OptionInput.FileChooserInput(option, fileSelectionMode),
-			defaultPath != null ? defaultPath.toString() : null
+			defaultPath != null ? defaultPath.toString() : null,
+			allowNone
 		);
 	}
 	
-	public void addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue){
+	public void addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone){
 		Option option = new Option(name);
 		addProperty(
 			option,
 			new OptionInput.TextFieldInput(option),
 			Integer.toString(defaultValue),
+			allowNone,
 			new Constraints.EnsureInt(option, minValue, maxValue)
 		);
 	}
 	
-	public void addTextProperty(String name, String defaultValue){
+	public void addTextProperty(String name, String defaultValue, boolean allowNone){
 		Option option = new Option(name);
-		addProperty(option, new OptionInput.TextFieldInput(option), defaultValue);
+		addProperty(option, new OptionInput.TextFieldInput(option), defaultValue, allowNone);
 	}
 	
 	public Config createConfig(Path configPath){
@@ -76,7 +79,7 @@ public class ConfigBuilder {
 		for (Entry<Option, String> entry : defaults.entrySet()){
 			Option option = entry.getKey();
 			String value = entry.getValue();
-			if (value != null){
+			if (value != null && !config.hasProperty(option.name)){
 				try {
 					option.setValue(value);
 				} catch (InvalidInputException e) {

@@ -22,11 +22,7 @@ public class Config {
 	private final Map<Option, OptionInput> options;
 	private final Path filePath;
 	
-	public Config(Path filePath, Map<Option, OptionInput> options){
-		if (!filePath.toFile().isFile()){
-			throw new IllegalArgumentException("filePath must be a file");
-		}
-		
+	public Config(Path filePath, Map<Option, OptionInput> options){		
 		// Bind Options to this config
 		for (Option option : options.keySet()){
 			option.setConfig(this);
