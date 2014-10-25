@@ -1,4 +1,4 @@
-package aohara.common.options;
+package aohara.common.config;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -59,15 +59,22 @@ public class Constraints {
 	}
 	
 	public static class EnsureInt extends Constraint {
+		
+		private final Integer min, max;
 
-		public EnsureInt(Option option) {
+		public EnsureInt(Option option, Integer min, Integer max) {
 			super(option);
+			this.min = min != null ? min : Integer.MIN_VALUE;
+			this.max = max != null ? max : Integer.MAX_VALUE;
 		}
 
 		@Override
 		public void check(String value) throws InvalidInputException {
 			try{
-				Integer.parseInt(value);
+				int val = Integer.parseInt(value);
+				if (val < min || val > max){
+					throw new InvalidInputException(String.format("%d is not in range (%d, %d)", val, min, max));
+				}
 			} catch(NumberFormatException ex){
 				throw new InvalidInputException(ex);
 			}

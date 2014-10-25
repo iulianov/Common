@@ -1,10 +1,9 @@
-package aohara.common.options;
+package aohara.common.config;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 
 import javax.swing.JButton;
@@ -14,7 +13,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import aohara.common.options.Constraint.InvalidInputException;
+import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
 
 public abstract class OptionInput implements DecoratedComponent<JComponent> {
@@ -38,16 +37,16 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 	}
 	
 	protected abstract String getValue();
+	public abstract void update();
 	
 	// -- Default Implementations -----------------------------------------
 	
 	public static class TextFieldInput extends OptionInput {
 		
-		private final JTextField textField;
+		private final JTextField textField = new JTextField();
 
 		public TextFieldInput(Option option) {
 			super(option);
-			textField = new JTextField(option.getValueString());
 		}
 
 		@Override
@@ -59,6 +58,11 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 		protected String getValue() {
 			return textField.getText();
 		}
+
+		@Override
+		public void update() {
+			textField.setText(option.getValue());
+		}
 	}
 	
 	public static class ComboBoxInput extends OptionInput {
@@ -68,7 +72,6 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 		public ComboBoxInput(Option option, Collection<String> choices) {
 			super(option);
 			box = new JComboBox<String>(choices.toArray(new String[choices.size()]));
-			box.setSelectedItem(option.getValue());
 		}
 
 		@Override
@@ -80,39 +83,25 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 		protected String getValue() {
 			return (String) box.getSelectedItem();
 		}
-	}
-	
-	public static class TrueFalseInput extends ComboBoxInput {
 
-		public TrueFalseInput(Option option) {
-			super(
-				option,
-				Arrays.asList(new String[]{Boolean.toString(true), Boolean.toString(false)})
-			);
+		@Override
+		public void update() {
+			box.setSelectedItem(option.getValue());
 		}
-		
 	}
 	
 	public static class FileChooserInput extends OptionInput {
 		
-		private final JPanel panel;
-		private final JTextField pathField;
+		private final JFileChooser chooser = new JFileChooser();
+		private final JPanel panel = new JPanel(new BorderLayout());
+		private final JTextField pathField = new JTextField();
 
 		public FileChooserInput(Option option, int fileSelectionMode) {
 			super(option);
 
-			panel = new JPanel();
-			panel.setLayout(new BorderLayout());
-			
-			// Create Path Field
-			pathField = new JTextField(option.getValue());
 			panel.add(pathField, BorderLayout.CENTER);
 			
-			// Create File Chooser
-			final JFileChooser chooser = new JFileChooser();
-			if (option.getValue() != null){
-				chooser.setSelectedFile(new File(option.getValue()));
-			}
+			// init File Chooser
 			chooser.setDialogTitle("Choose path");
 			chooser.setApproveButtonText("Select KSP Path");
 			chooser.setFileSelectionMode(fileSelectionMode);
@@ -138,6 +127,13 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 		@Override
 		protected String getValue() {
 			return pathField.getText();
+		}
+
+		@Override
+		public void update() {
+			String value = option.getValue();
+			chooser.setSelectedFile(value != null ? new File(value) : null);
+			pathField.setText(value);
 		}
 	}
 

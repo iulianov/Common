@@ -6,11 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.io.FilenameUtils;
 
-import aohara.common.workflows.Workflow;
+import aohara.common.workflows.Workflow.WorkflowTask;
 import aohara.common.workflows.tasks.gen.PathGen;
 import aohara.common.workflows.tasks.gen.URIGen;
 
@@ -24,14 +25,18 @@ public class FileTransferTask extends WorkflowTask {
 	public static final float REPORT_PER_PERCENT = (float) 0.01;
 	private final URIGen srcGen, destGen;
 	
-	public FileTransferTask(Workflow workflow, URIGen src, PathGen dest){
-		super(workflow);
+	public FileTransferTask(URIGen src, PathGen dest){
 		this.srcGen = src;
 		this.destGen = dest;
 	}
 
 	@Override
 	public Boolean call() throws Exception {
+		// Do not download if no input was specified
+		if (srcGen.getURI() == null){
+			return true;
+		}
+		
 		File destFile = new File(destGen.getURI());
 		
 		// Check if destination is a folder
@@ -85,7 +90,8 @@ public class FileTransferTask extends WorkflowTask {
 	@Override
 	public int getTargetProgress() throws IOException {
 		try {
-			return srcGen.getURI().toURL().openConnection().getContentLength();
+			URI uri = srcGen.getURI();
+			return uri != null ? uri.toURL().openConnection().getContentLength() : -1;
 		} catch (URISyntaxException e) {
 			throw new IOException(e);
 		}

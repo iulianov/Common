@@ -1,10 +1,11 @@
 package aohara.common.workflows;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 
 import aohara.common.Listenable;
-import aohara.common.workflows.tasks.WorkflowTask;
 
 /**
  * Queues Tasks for Asynchronous Execution at a later date.
@@ -37,6 +38,7 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 		if (status != Status.Ready){
 			throw new IllegalArgumentException("Can only add tasks before workflow has started.");
 		}
+		task.workflow = this;
 		tasks.add(task);
 		totalTasks++;
 	}
@@ -91,4 +93,34 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 	public String toString(){
 		return name;
 	}
+	
+	/**
+	 * Abstract Base Class used to perform work for {@link aohara.common.workflows.Workflow}s.
+	 * 
+	 * The call() method is to return a boolean.  This boolean is used to decide
+	 * whether the {@link aohara.common.workflows.Workflow} will continue executing.
+	 * 
+	 * @author Andrew O'Hara
+	 */
+	public static abstract class WorkflowTask implements Callable<Boolean> {
+
+		private Workflow workflow;
+		
+		protected void progress(int increment){
+			workflow.notifyProgress(this, increment);
+		}
+		
+		public Workflow getWorkflow(){
+			return workflow;
+		}
+		
+		public abstract int getTargetProgress() throws IOException;
+		public abstract String getTitle();
+		
+		@Override
+		public String toString(){
+			return getTitle();
+		}
+	}
+
 }

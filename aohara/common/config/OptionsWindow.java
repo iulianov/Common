@@ -1,8 +1,8 @@
-package aohara.common.options;
+package aohara.common.config;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -12,22 +12,22 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import aohara.common.options.Constraint.InvalidInputException;
+import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
 
 public class OptionsWindow implements DecoratedComponent<JPanel>{
 	
 	private final JPanel panel = new JPanel();
 	private JDialog dialog;
-	private final Set<OptionInput> optionInputs;
+	private final Collection<OptionInput> optionInputs;
 	private final String title;
 	private final boolean restartOnSuccess, exitOnCancel;
 	
-	public OptionsWindow(String title, Set<OptionInput> optionInputs){
+	public OptionsWindow(String title, Collection<OptionInput> optionInputs){
 		this(title, optionInputs, false, false);
 	}
 	
-	public OptionsWindow(String title, Set<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
+	public OptionsWindow(String title, Collection<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
 		this.title = title;
 		this.optionInputs = optionInputs;
 		this.restartOnSuccess = restartOnSuccess;
@@ -39,6 +39,7 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 		for (OptionInput input : optionInputs){
 			panel.add(new JLabel(String.format("<html><b>%s</b></html>", input.getName())));
 			panel.add(input.getComponent());
+			input.update(); // Get Value from option and place in component
 			
 		}
 		panel.add(new JButton(new SubmitAction()));
@@ -128,9 +129,6 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 					System.exit(1);
 				}
 			}
-		}
-		
-		
+		}	
 	}
-
 }

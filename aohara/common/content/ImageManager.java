@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -134,4 +135,21 @@ public class ImageManager {
 		}
 		return image;
 	}
+	
+	public BufferedImage colorize(BufferedImage image, Color colour) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        WritableRaster raster = image.getRaster();
+
+        for (int xx = 0; xx < width; xx++) {
+            for (int yy = 0; yy < height; yy++) {
+                int[] pixels = raster.getPixel(xx, yy, (int[]) null);
+                pixels[0] = colour.getRed();
+                pixels[1] = colour.getGreen();
+                pixels[2] = colour.getBlue();
+                raster.setPixel(xx, yy, pixels);
+            }
+        }
+        return image;
+    }
 }

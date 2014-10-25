@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import aohara.common.selectorPanel.DecoratedComponent;
-import aohara.common.workflows.tasks.WorkflowTask;
+import aohara.common.workflows.Workflow.WorkflowTask;
 
 /**
  * Panel that is used to display the progress of various {@link aohara.common.workflows.Workflow}s.
@@ -39,7 +39,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		bar.setIndeterminate(target < 1);
 		bar.setStringPainted(true);
 		panel.add(bar);
-		bars.put(task.workflow, bar);
+		bars.put(task.getWorkflow(), bar);
 
 		panel.setVisible(true);
 		panel.validate();
@@ -49,7 +49,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	
 	@Override
 	public void taskProgress(WorkflowTask task, int increment) {	
-		Workflow workflow = task.workflow;
+		Workflow workflow = task.getWorkflow();
 		
 		JProgressBar bar = bars.get(workflow);
 		bar.setValue(bar.getValue() + increment);
@@ -65,7 +65,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	
 	@Override
 	public void taskComplete(WorkflowTask task, boolean tasksRemaining){
-		JProgressBar bar = bars.remove(task.workflow);
+		JProgressBar bar = bars.remove(task.getWorkflow());
 		
 		// Should be done first for panel to notice change during component removal
 		if (!tasksRemaining){
@@ -82,7 +82,7 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		e.printStackTrace();
 		JOptionPane.showMessageDialog(
 			panel,
-			"An error ocurred while processing:\n" + task.workflow + "\n\n" + e,
+			"An error ocurred while processing:\n" + task.getWorkflow() + "\n\n" + e,
 			"Error!",
 			JOptionPane.ERROR_MESSAGE
 		);

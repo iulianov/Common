@@ -1,34 +1,24 @@
 package aohara.common.test;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
+import java.io.IOException;
+import java.nio.file.Files;
 
-import aohara.common.options.Constraints;
-import aohara.common.options.Option;
-import aohara.common.options.OptionInput;
-import aohara.common.options.OptionSaveStrategy;
-import aohara.common.options.OptionsWindow;
+import aohara.common.config.Config;
+import aohara.common.config.ConfigBuilder;
 
 public class TestOptionsWindow {
 
-	public static void main(String[] args){
-		Set<OptionInput> optionInputs = new HashSet<>();
+	public static void main(String[] args) throws IOException{
+		ConfigBuilder builder = new ConfigBuilder();
+		builder.addIntProperty("age", 22, 0, null, false);
+		builder.addTrueFalseProperty("Human", null, false);
 		
-		Option strOption = new Option("String", new OptionSaveStrategy.NullStrategy());
-		strOption.addConstraint(new Constraints.MinLength(strOption, 5));
-		optionInputs.add(new OptionInput.TextFieldInput(strOption));
+		Config config = builder.createConfig(Files.createTempFile("temp", ".properties"));
+		config.openOptionsWindow(true, true);
 		
-		Option intOption = new Option("int option", "1", new OptionSaveStrategy.NullStrategy());
-		optionInputs.add(new OptionInput.TextFieldInput(intOption));
-		
-		Vector<String> choices = new Vector<>();
-		choices.add("foo");
-		choices.add("bar");
-		choices.add("baz");
-		Option multiOption = new Option("multi", choices.get(0), new OptionSaveStrategy.NullStrategy());
-		optionInputs.add(new OptionInput.ComboBoxInput(multiOption, choices));
-		
-		new OptionsWindow("options", optionInputs).toDialog();
+		System.out.println("You Entered:\n");
+		for (String key : config.keySet()){
+			System.out.println(String.format("%s: %s", key, config.getProperty(key)));
+		}
 	}
 }

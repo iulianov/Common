@@ -1,6 +1,7 @@
 package aohara.common.workflows;
 
-import aohara.common.workflows.tasks.WorkflowTask;
+import aohara.common.workflows.Workflow.WorkflowTask;
+
 
 /**
  * Listens to events from {aohara.common.workflows.tasks.WorkflowTask}s.
