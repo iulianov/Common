@@ -33,24 +33,22 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	}
 
 	@Override
-	public void taskStarted(WorkflowTask task, int target) {
+	public void taskStarted(Workflow workflow, WorkflowTask task, int target) {
 		JProgressBar bar = new JProgressBar();
 		bar.setMaximum(target > 0 ? target : 0);
 		bar.setIndeterminate(target < 1);
 		bar.setStringPainted(true);
 		panel.add(bar);
-		bars.put(task.getWorkflow(), bar);
+		bars.put(workflow, bar);
 
 		panel.setVisible(true);
 		panel.validate();
 		
-		taskProgress(task, 0);
+		taskProgress(workflow, task, 0);
 	}
 	
 	@Override
-	public void taskProgress(WorkflowTask task, int increment) {	
-		Workflow workflow = task.getWorkflow();
-		
+	public void taskProgress(Workflow workflow, WorkflowTask task, int increment) {			
 		JProgressBar bar = bars.get(workflow);
 		bar.setValue(bar.getValue() + increment);
 		if (bar.isIndeterminate()){
@@ -64,8 +62,8 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	}
 	
 	@Override
-	public void taskComplete(WorkflowTask task, boolean tasksRemaining){
-		JProgressBar bar = bars.remove(task.getWorkflow());
+	public void taskComplete(Workflow workflow, WorkflowTask task, boolean tasksRemaining){
+		JProgressBar bar = bars.remove(workflow);
 		
 		// Should be done first for panel to notice change during component removal
 		if (!tasksRemaining){
@@ -78,15 +76,15 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 	}
 
 	@Override
-	public void taskError(WorkflowTask task, boolean tasksRemaining, Exception e) {
+	public void taskError(Workflow workflow, WorkflowTask task, boolean tasksRemaining, Exception e) {
 		e.printStackTrace();
 		JOptionPane.showMessageDialog(
 			panel,
-			"An error ocurred while processing:\n" + task.getWorkflow() + "\n\n" + e,
+			"An error ocurred while processing:\n" + workflow + "\n\n" + e,
 			"Error!",
 			JOptionPane.ERROR_MESSAGE
 		);
-		taskComplete(task, tasksRemaining);
+		taskComplete(workflow, task, tasksRemaining);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import thirdParty.ZipNode;
 import aohara.common.workflows.ConflictResolver;
 import aohara.common.workflows.ConflictResolver.Resolution;
+import aohara.common.workflows.Workflow;
 import aohara.common.workflows.Workflow.WorkflowTask;
 
 /**
@@ -29,7 +30,7 @@ public class UnzipTask extends WorkflowTask {
 	}
 	
 	@Override
-	public Boolean call() throws Exception {
+	public boolean call(Workflow workflow) throws IOException {
 		if (destPath.toFile().isFile() && destPath.toFile().exists()){
 			Resolution res = cr.getResolution(destPath);
 			if (res.equals(Resolution.Overwrite)){

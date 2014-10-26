@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.io.FilenameUtils;
 
+import aohara.common.workflows.Workflow;
 import aohara.common.workflows.Workflow.WorkflowTask;
 import aohara.common.workflows.tasks.gen.PathGen;
 import aohara.common.workflows.tasks.gen.URIGen;
@@ -31,7 +32,7 @@ public class FileTransferTask extends WorkflowTask {
 	}
 
 	@Override
-	public Boolean call() throws Exception {
+	public boolean call(Workflow workflow) throws IOException, URISyntaxException {
 		// Do not download if no input was specified
 		if (srcGen.getURI() == null){
 			return true;
@@ -68,7 +69,7 @@ public class FileTransferTask extends WorkflowTask {
 				os.write(buf, 0, bytesRead);
 				currentBunch += bytesRead;
 				if (currentBunch / contentLength >= REPORT_PER_PERCENT){
-					progress(currentBunch);
+					progress(workflow, currentBunch);
 					currentBunch = 0;
 				}
 			}

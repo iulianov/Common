@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
+import aohara.common.workflows.Workflow;
 import aohara.common.workflows.Workflow.WorkflowTask;
 import aohara.common.workflows.tasks.gen.PathGen;
 
@@ -24,14 +25,14 @@ public class DeleteTask extends WorkflowTask {
 	}
 
 	@Override
-	public Boolean call() throws FileNotFoundException {
+	public boolean call(Workflow workflow) throws FileNotFoundException {
 		Path path = pathGen.getPath();
 		for (File file : getFiles(path.toFile())){
 			int size = (int) file.length();
 			if (file.exists() && !file.delete()) {
 				throw new FileNotFoundException("Failed to delete file: " + path.toFile());
 			}
-			progress(size);
+			progress(workflow, size);
 		}
 		return true;
 	}
