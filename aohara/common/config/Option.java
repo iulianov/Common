@@ -9,18 +9,14 @@ public class Option {
 	
 	private final Collection<Constraint> constraints = new LinkedList<>();
 	public final String name;
-	private Config config;
+	private String value;
 	
 	public Option(String name){
 		this.name = name;
 	}
 	
-	public void setConfig(Config config){
-		this.config = config;
-	}
-	
 	public String getValue(){
-		return config.getProperty(name);
+		return value;
 	}
 	
 	public void testValue(String value) throws InvalidInputException{
@@ -31,7 +27,7 @@ public class Option {
 	
 	public void setValue(String value) throws InvalidInputException{		
 		testValue(value);
-		config.setProperty(name, value);
+		this.value = value;
 	}
 	
 	public void addConstraint(Constraint constraint){

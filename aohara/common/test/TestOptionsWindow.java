@@ -3,8 +3,8 @@ package aohara.common.test;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import aohara.common.config.Config;
 import aohara.common.config.ConfigBuilder;
+import aohara.common.config.GuiConfig;
 
 public class TestOptionsWindow {
 
@@ -13,7 +13,7 @@ public class TestOptionsWindow {
 		builder.addIntProperty("age", 22, 0, null, false);
 		builder.addTrueFalseProperty("Human", null, false);
 		
-		Config config = builder.createConfig(Files.createTempFile("temp", ".properties"));
+		GuiConfig config = builder.createGuiConfig("test", Files.createTempFile("temp", ".properties"));
 		config.openOptionsWindow(true, true);
 		
 		System.out.println("You Entered:\n");

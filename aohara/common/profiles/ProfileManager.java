@@ -47,7 +47,7 @@ public class ProfileManager {
 	public Profile getProfile(String name){
 		JsonObject obj = findProfile(name);
 		
-		Profile profile = new MapProfile(name);
+		Profile profile = new HashMapProfile(name);
 		for (Entry<String, JsonElement> entry : obj.entrySet()){
 			if (!entry.getKey().equals(Profile.NAME)){
 				profile.putProperty(entry.getKey(), entry.getValue().getAsString());
@@ -63,7 +63,7 @@ public class ProfileManager {
 	// -- Mutators --------------------------------------------------------
 	
 	public Profile newProfile(String name){
-		return new MapProfile(name);
+		return new HashMapProfile(name);
 	}
 	
 	public Profile saveProfile(Profile profile){

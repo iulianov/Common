@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import aohara.common.config.Constraint.InvalidInputException;
+import aohara.common.config.loader.ConfigLoader;
+import aohara.common.config.loader.JsonConfigLoader;
 
 public class ConfigBuilder {
 	
@@ -73,13 +75,49 @@ public class ConfigBuilder {
 		addProperty(option, new OptionInput.TextFieldInput(option), defaultValue, allowNone);
 	}
 	
-	public Config createConfig(Path configPath){
-		Config config = new Config(configPath, options);
-		
+	// --------------
+	// -- Builders --
+	// --------------
+	
+	public Config createConfig(String name, Path filePath){
+		Config config = new Config(name, createLoader(filePath), options.keySet());
+		setDefaults(config);
+		return config;
+	}
+	
+	public Config createConfigInDocuments(String name, String folderName, String fileName){
+		return createConfig(name, Paths.get(
+			System.getProperty("user.home"), "Documents",
+			folderName, fileName
+		));
+	}
+	
+	public GuiConfig createGuiConfig(String name, Path filePath){
+		GuiConfig config = new GuiConfig(name, createLoader(filePath), options);
+		setDefaults(config);
+		return config;
+	}
+	
+	public GuiConfig createGuiConfigInDocuments(String name, String folderName, String fileName){
+		return createGuiConfig(name, Paths.get(
+			System.getProperty("user.home"), "Documents",
+			folderName, fileName
+		));
+	}
+	
+	// -------------
+	// -- Helpers --
+	// -------------
+	
+	private ConfigLoader createLoader(Path filePath){
+		return new JsonConfigLoader(filePath);
+	}
+	
+	private void setDefaults(Config config){
 		for (Entry<Option, String> entry : defaults.entrySet()){
 			Option option = entry.getKey();
 			String value = entry.getValue();
-			if (value != null && !config.hasProperty(option.name)){
+			if (value != null && config.getProperty(option.name) == null){
 				try {
 					option.setValue(value);
 				} catch (InvalidInputException e) {
@@ -87,13 +125,5 @@ public class ConfigBuilder {
 				}
 			}
 		}
-		return config;
-	}
-	
-	public Config createConfigInDocuments(String folderName, String configName){
-		return createConfig(Paths.get(
-			System.getProperty("user.home"), "Documents",
-			folderName, configName
-		));
 	}
 }

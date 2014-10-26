@@ -28,10 +28,6 @@ public abstract class OptionInput implements DecoratedComponent<JComponent> {
 		return option.name;
 	}
 	
-	public void testValue() throws InvalidInputException {
-		option.testValue(getValue());
-	}
-	
 	public void apply() throws InvalidInputException{
 		option.setValue(getValue());
 	}
