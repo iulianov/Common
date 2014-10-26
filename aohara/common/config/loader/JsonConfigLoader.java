@@ -86,7 +86,10 @@ public class JsonConfigLoader extends ConfigLoader {
 			// Try to set value to config
 			JsonObject pair  = ele.getAsJsonObject();
 			try {
-				config.setProperty(pair.get(KEY).getAsString(), pair.get(VALUE).getAsString());
+				String key = pair.get(KEY).getAsString();
+				if (config.hasProperty(key)){
+					config.setProperty(key, pair.get(VALUE).getAsString());
+				}
 			} catch (InvalidInputException e) {
 				e.printStackTrace();
 			}
