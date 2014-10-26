@@ -8,13 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 
 import org.apache.commons.io.FilenameUtils;
 
 import aohara.common.workflows.Workflow;
 import aohara.common.workflows.Workflow.WorkflowTask;
-import aohara.common.workflows.tasks.gen.PathGen;
-import aohara.common.workflows.tasks.gen.URIGen;
 
 /**
  * WorkflowTask to transfer the file from the given URL to the given path location.
@@ -24,26 +23,27 @@ import aohara.common.workflows.tasks.gen.URIGen;
 public class FileTransferTask extends WorkflowTask {
 	
 	public static final float REPORT_PER_PERCENT = (float) 0.01;
-	private final URIGen srcGen, destGen;
+	private final URI src;
+	private final Path dest;
 	
-	public FileTransferTask(URIGen src, PathGen dest){
-		this.srcGen = src;
-		this.destGen = dest;
+	public FileTransferTask(URI src, Path dest){
+		this.src = src;
+		this.dest = dest;
 	}
 
 	@Override
 	public boolean call(Workflow workflow) throws IOException, URISyntaxException {
 		// Do not download if no input was specified
-		if (srcGen.getURI() == null){
+		if (src  == null){
 			return true;
 		}
 		
-		File destFile = new File(destGen.getURI());
+		File destFile = dest.toFile();
 		
 		// Check if destination is a folder
 		if (destFile.isDirectory()){
-			String baseName = FilenameUtils.getBaseName(srcGen.getURI().getPath());
-	        String extension = FilenameUtils.getExtension(srcGen.getURI().getPath());
+			String baseName = FilenameUtils.getBaseName(src.getPath());
+	        String extension = FilenameUtils.getExtension(src.getPath());
 	        destFile = new File(destFile, String.format("%s.%s", baseName, extension));
 		}
 		
@@ -58,8 +58,8 @@ public class FileTransferTask extends WorkflowTask {
 		
 		// Perform Transfer
 		try (
-			InputStream is = new BufferedInputStream(srcGen.getURI().toURL().openStream());
-			OutputStream os = new FileOutputStream(new File(destGen.getURI()));
+			InputStream is = new BufferedInputStream(src.toURL().openStream());
+			OutputStream os = new FileOutputStream(destFile);
 		){
 			float contentLength = getTargetProgress();
 			byte[] buf = new byte[1024];
@@ -78,23 +78,12 @@ public class FileTransferTask extends WorkflowTask {
 	}
 
 	@Override
-	public String getTitle() {
-		String dest = "null";
-		try {
-			dest = destGen.getURI().getPath();
-		} catch (URISyntaxException e) {
-		}
-		
+	public String getTitle() {		
 		return String.format("Transferring to %s", dest);
 	}
 
 	@Override
 	public int getTargetProgress() throws IOException {
-		try {
-			URI uri = srcGen.getURI();
-			return uri != null ? uri.toURL().openConnection().getContentLength() : -1;
-		} catch (URISyntaxException e) {
-			throw new IOException(e);
-		}
+		return src != null ? src.toURL().openConnection().getContentLength() : -1;
 	}
 }
