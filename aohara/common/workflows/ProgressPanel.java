@@ -66,12 +66,13 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		JProgressBar bar = bars.remove(workflow);
 		
 		// Should be done first for panel to notice change during component removal
-		if (!tasksRemaining){
+		if (!tasksRemaining && bars.isEmpty()){
 			panel.setVisible(false);
 		}
 		
 		if (bar != null){
 			panel.remove(bar);
+			panel.repaint();
 		}
 	}
 
