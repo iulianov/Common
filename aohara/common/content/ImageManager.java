@@ -84,11 +84,7 @@ public class ImageManager {
 	}
 	
 	private double getScaleFactor(int iMasterSize, int iTargetSize) {
-	    if (iMasterSize > iTargetSize) {
-	        return (double) iTargetSize / (double) iMasterSize;
-	    } else {
-	        return (double) iTargetSize / (double) iMasterSize;
-	    }
+		return (double) iTargetSize / (double) iMasterSize;
 	}
 	
 	public BufferedImage grayScale(BufferedImage original) {
