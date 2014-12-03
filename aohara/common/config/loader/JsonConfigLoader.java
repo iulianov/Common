@@ -97,6 +97,7 @@ public class JsonConfigLoader extends ConfigLoader {
 	}
 	
 	private void save(JsonArray configArray){
+		filePath.getParent().toFile().mkdirs();
 		try(FileWriter writer = new FileWriter(filePath.toFile())){
 			gson.toJson(configArray, writer);
 		} catch (IOException e) {
