@@ -49,7 +49,11 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	private JScrollPane scrollPane;
 	private JPopupMenu popupMenu;
 
-	public SelectorPanel(SelectorView<T, JPanel> view, Comparator<T> comparator){
+	public SelectorPanel(SelectorView<T, JPanel> view, Comparator<T> comparator, Dimension size, float splitRatio){
+		if (splitRatio < 0 || splitRatio > 1){
+			throw new IllegalArgumentException("splitRatio must be between (0,1)");
+		}
+		
 		list = new JList<T>(new SortedListModel<T>(comparator));
 		
 		views.add(view);
@@ -60,8 +64,9 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		list.addMouseListener(this);
 		
 		// Add Componenents to JSplitPane
-		splitPane.setLeftComponent(createSidePanel(list, new Dimension(200, 700)));
-		splitPane.setRightComponent(createSidePanel(view.getComponent(), new Dimension(620, 700)));
+		int leftWidth = (int) (size.width * splitRatio);
+		splitPane.setLeftComponent(createSidePanel(list, new Dimension(leftWidth, size.height)));
+		splitPane.setRightComponent(createSidePanel(view.getComponent(), new Dimension(size.width - leftWidth, size.height)));
 	}
 	
 	private JPanel createSidePanel(JComponent comp, Dimension preferredSize){
