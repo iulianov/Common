@@ -3,7 +3,6 @@ package aohara.common.workflows;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.Callable;
 
 import aohara.common.Listenable;
 
@@ -38,7 +37,6 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 		if (status != Status.Ready){
 			throw new IllegalArgumentException("Can only add tasks before workflow has started.");
 		}
-		task.workflow = this;
 		tasks.add(task);
 		totalTasks++;
 	}
@@ -54,18 +52,18 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 			while(!tasks.isEmpty() && keepGoing){
 				task = tasks.poll();
 				for (TaskListener l : getListeners()){
-					l.taskStarted(task, task.getTargetProgress());
+					l.taskStarted(this, task, task.getTargetProgress());
 				}
-				keepGoing = task.call();
+				keepGoing = task.call(this);
 				for (TaskListener l : getListeners()){
-					l.taskComplete(task, !tasks.isEmpty() && keepGoing);
+					l.taskComplete(this, task, !tasks.isEmpty() && keepGoing);
 				}
 			}
 			status = Status.Finished;
 		}
 		catch (Exception e) { // Stop if exception occurs
 			for (TaskListener l : getListeners()){
-				l.taskError(task, false, e);
+				l.taskError(this, task, false, e);
 			}
 			status = Status.Error;
 		}
@@ -73,7 +71,7 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 	
 	public void notifyProgress(WorkflowTask task, int increment){
 		for (TaskListener l : getListeners()){
-			l.taskProgress(task, increment);
+			l.taskProgress(this, task, increment);
 		}
 	}
 	
@@ -102,16 +100,10 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 	 * 
 	 * @author Andrew O'Hara
 	 */
-	public static abstract class WorkflowTask implements Callable<Boolean> {
-
-		private Workflow workflow;
+	public static abstract class WorkflowTask {
 		
-		protected void progress(int increment){
+		protected void progress(Workflow workflow, int increment){
 			workflow.notifyProgress(this, increment);
-		}
-		
-		public Workflow getWorkflow(){
-			return workflow;
 		}
 		
 		public abstract int getTargetProgress() throws IOException;
@@ -121,6 +113,8 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 		public String toString(){
 			return getTitle();
 		}
+		
+		public abstract boolean call(Workflow workflow) throws Exception;
 	}
 
 }

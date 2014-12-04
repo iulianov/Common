@@ -13,9 +13,9 @@ import aohara.common.workflows.Workflow.WorkflowTask;
  */
 public interface TaskListener {
 	
-	public void taskStarted(WorkflowTask task, int targetProgress);
-	public void taskProgress(WorkflowTask task, int increment);
-	public void taskError(WorkflowTask task, boolean tasksRemaining, Exception e);
-	public void taskComplete(WorkflowTask task, boolean tasksRemaining);
+	public void taskStarted(Workflow workflow, WorkflowTask task, int targetProgress);
+	public void taskProgress(Workflow workflow, WorkflowTask task, int increment);
+	public void taskError(Workflow workflow, WorkflowTask task, boolean tasksRemaining, Exception e);
+	public void taskComplete(Workflow workflow, WorkflowTask task, boolean tasksRemaining);
 
 }

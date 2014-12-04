@@ -1,7 +1,8 @@
 package aohara.common.workflows;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
@@ -12,10 +13,6 @@ import aohara.common.workflows.Workflow.WorkflowTask;
 import aohara.common.workflows.tasks.BrowserGoToTask;
 import aohara.common.workflows.tasks.DeleteTask;
 import aohara.common.workflows.tasks.FileTransferTask;
-import aohara.common.workflows.tasks.gen.GenFactory;
-import aohara.common.workflows.tasks.gen.PathGen;
-import aohara.common.workflows.tasks.gen.URIGen;
-import aohara.common.workflows.tasks.gen.URLGen;
 
 /**
  * Class with methods for adding standard tasks to a Workflow
@@ -30,36 +27,40 @@ public class WorkflowBuilder {
 		this.workflowName = workflowName;
 	}
 	
-	public void copy(URIGen src, PathGen path) throws MalformedURLException{
-		download(src, path);
+	public void copy(Path src, Path dest) {
+		addTask(new FileTransferTask(src.toUri(), dest));
 	}
 	
-	public void download(URIGen src, PathGen path){
-		addTask(new FileTransferTask(src, path));
+	public void download(URL src, Path dest) {
+		try {
+			addTask(new FileTransferTask(src.toURI(), dest));
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public void delete(PathGen pathGen){
-		addTask(new DeleteTask(pathGen));
+	public void delete(Path path){
+		addTask(new DeleteTask(path));
 	}
 	
-	public void move(PathGen src, PathGen dest) throws MalformedURLException{
+	public void move(Path src, Path dest) {
 		copy(src, dest);
 		delete(src);
 	}
 	
-	public void tempDownload(URLGen url, PathGen destGen) throws IOException{
+	public void tempDownload(URL url, Path dest) throws IOException {
 		Path temp = downloadToTemp(url);
-		copy(GenFactory.fromPath(temp), destGen);
+		copy(temp, dest);
 	}
 	
-	public Path downloadToTemp(URLGen url) throws IOException {
+	public Path downloadToTemp(URL url) throws IOException {
 		Path temp = Files.createTempFile("download", ".tempDownload");
 		temp.toFile().deleteOnExit();
-		download(url, GenFactory.fromPath(temp));
+		download(url, temp);
 		return temp;
 	}
 	
-	public void browserGoTo(URLGen dest){
+	public void browserGoTo(URL dest){
 		addTask(new BrowserGoToTask(dest));
 	}
 	

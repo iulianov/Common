@@ -1,33 +1,34 @@
 package aohara.common.workflows.tasks;
 
 import java.io.IOException;
+import java.net.URL;
 
 import aohara.common.Util;
+import aohara.common.workflows.Workflow;
 import aohara.common.workflows.Workflow.WorkflowTask;
-import aohara.common.workflows.tasks.gen.URLGen;
 
 public class BrowserGoToTask extends WorkflowTask {
 	
-	private final URLGen url;
+	private final URL url;
 
-	public BrowserGoToTask(URLGen url) {
+	public BrowserGoToTask(URL url) {
 		this.url = url;
 	}
 
 	@Override
-	public Boolean call() throws Exception {
-		Util.goToHyperlink(url.getURL());
+	public boolean call(Workflow workflow) throws IOException {
+		Util.goToHyperlink(url);
 		return true;
 	}
 
 	@Override
 	public int getTargetProgress() throws IOException {
-		return url.getURL().openConnection().getContentLength();
+		return url.openConnection().getContentLength();
 	}
 
 	@Override
 	public String getTitle() {
-		return "Directing Browser to " + url.getURL();
+		return "Directing Browser to " + url;
 	}
 
 }

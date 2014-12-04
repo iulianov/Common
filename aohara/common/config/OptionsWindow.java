@@ -1,8 +1,8 @@
-package aohara.common.options;
+package aohara.common.config;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.util.Set;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -12,33 +12,34 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import aohara.common.options.Constraint.InvalidInputException;
+import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
 
 public class OptionsWindow implements DecoratedComponent<JPanel>{
 	
 	private final JPanel panel = new JPanel();
 	private JDialog dialog;
-	private final Set<OptionInput> optionInputs;
-	private final String title;
+	private final Collection<OptionInput> optionInputs;
 	private final boolean restartOnSuccess, exitOnCancel;
+	private final Config config;
 	
-	public OptionsWindow(String title, Set<OptionInput> optionInputs){
-		this(title, optionInputs, false, false);
+	public OptionsWindow(Config config, Collection<OptionInput> optionInputs){
+		this(config, optionInputs, false, false);
 	}
 	
-	public OptionsWindow(String title, Set<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
-		this.title = title;
+	public OptionsWindow(Config config, Collection<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
+		this.config = config;
 		this.optionInputs = optionInputs;
 		this.restartOnSuccess = restartOnSuccess;
 		this.exitOnCancel = exitOnCancel;
 		
 		panel.setLayout(new GridLayout(optionInputs.size() + 1, 2));
-		panel.setBorder(BorderFactory.createTitledBorder(title));
+		panel.setBorder(BorderFactory.createTitledBorder(config.getName()));
 		
 		for (OptionInput input : optionInputs){
 			panel.add(new JLabel(String.format("<html><b>%s</b></html>", input.getName())));
 			panel.add(input.getComponent());
+			input.update(); // Get Value from option and place in component
 			
 		}
 		panel.add(new JButton(new SubmitAction()));
@@ -53,7 +54,7 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 	public JDialog toDialog(){
 		if (dialog == null || !dialog.isActive()){
 			dialog = new JDialog();
-			dialog.setTitle(title);
+			dialog.setTitle(config.getName());
 			dialog.setModal(true);
 			dialog.add(getComponent());
 			
@@ -73,16 +74,12 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 
 		@Override
 		public void actionPerformed(ActionEvent ev) {			
-			try {
-				// Test Values before applying
-				for (OptionInput input : optionInputs){
-					input.testValue();
-				}
-				
+			try {				
 				// Apply Values
 				for (OptionInput input : optionInputs){
 					input.apply();
 				}
+				config.save();
 				
 				if (dialog != null){
 					dialog.setVisible(false);
@@ -100,6 +97,8 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 				}
 				
 			} catch(InvalidInputException ex){
+				config.rollback();  // Rollback changes to config
+				
 				JOptionPane.showMessageDialog(
 					getComponent(),
 					ex.getMessage(),
@@ -128,9 +127,6 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 					System.exit(1);
 				}
 			}
-		}
-		
-		
+		}	
 	}
-
 }
