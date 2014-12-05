@@ -59,6 +59,7 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 			dialog.add(getComponent());
 			
 			dialog.pack();
+			dialog.setLocationRelativeTo(null);
 			dialog.setVisible(true);
 		}
 
