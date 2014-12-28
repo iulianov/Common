@@ -9,10 +9,12 @@ public class Option {
 	
 	private final Collection<Constraint> constraints = new LinkedList<>();
 	public final String name;
+	public final boolean hidden;
 	private String value;
 	
-	public Option(String name){
+	public Option(String name, boolean hidden){
 		this.name = name;
+		this.hidden = hidden;
 	}
 	
 	public String getValue(){

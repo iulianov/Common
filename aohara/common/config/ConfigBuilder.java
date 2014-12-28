@@ -30,8 +30,8 @@ public class ConfigBuilder {
 		defaults.put(option, defaultValue);
 	}
 	
-	public void addMultiProperty(String name, Collection<String> choices, String defaultValue, boolean allowNone){
-		Option option = new Option(name);
+	public void addMultiProperty(String name, Collection<String> choices, String defaultValue, boolean allowNone, boolean hidden){
+		Option option = new Option(name, hidden);
 		addProperty(
 			option,
 			new OptionInput.ComboBoxInput(option, choices),
@@ -40,17 +40,18 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addTrueFalseProperty(String name, Boolean defaultValue, boolean allowNone){
+	public void addTrueFalseProperty(String name, Boolean defaultValue, boolean allowNone, boolean hidden){
 		addMultiProperty(
 			name,
 			Arrays.asList(new String[]{Boolean.TRUE.toString(), Boolean.FALSE.toString()}),
 			defaultValue != null ? defaultValue.toString() : null,
-			allowNone
+			allowNone,
+			hidden
 		);
 	}
 	
-	public void addPathProperty(String name, int fileSelectionMode, Path defaultPath, boolean allowNone){
-		Option option = new Option(name);		
+	public void addPathProperty(String name, int fileSelectionMode, Path defaultPath, boolean allowNone, boolean hidden){
+		Option option = new Option(name, hidden);		
 		addProperty(
 			option,
 			new OptionInput.FileChooserInput(option, fileSelectionMode),
@@ -59,8 +60,8 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone){
-		Option option = new Option(name);
+	public void addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone, boolean hidden){
+		Option option = new Option(name, hidden);
 		addProperty(
 			option,
 			new OptionInput.TextFieldInput(option),
@@ -70,8 +71,8 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addTextProperty(String name, String defaultValue, boolean allowNone){
-		Option option = new Option(name);
+	public void addTextProperty(String name, String defaultValue, boolean allowNone, boolean hidden){
+		Option option = new Option(name, hidden);
 		addProperty(option, new OptionInput.TextFieldInput(option), defaultValue, allowNone);
 	}
 	

@@ -37,9 +37,11 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 		panel.setBorder(BorderFactory.createTitledBorder(config.getName()));
 		
 		for (OptionInput input : optionInputs){
-			panel.add(new JLabel(String.format("<html><b>%s</b></html>", input.getName())));
-			panel.add(input.getComponent());
-			input.update(); // Get Value from option and place in component
+			if (!input.option.hidden){
+				panel.add(new JLabel(String.format("<html><b>%s</b></html>", input.getName())));
+				panel.add(input.getComponent());
+				input.update(); // Get Value from option and place in component
+			}
 			
 		}
 		panel.add(new JButton(new SubmitAction()));
