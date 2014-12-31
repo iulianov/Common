@@ -1,6 +1,5 @@
 package aohara.common.selectorPanel;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -74,16 +74,17 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.getVerticalScrollBar().setUnitIncrement(10);
 		
-		JPanel sidePanel = new JPanel(new BorderLayout());
+		JPanel sidePanel = new JPanel();
+		sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
 		sidePanel.setPreferredSize(preferredSize);
-		sidePanel.add(scrollPane, BorderLayout.CENTER);
+		sidePanel.add(scrollPane);
 		
 		return sidePanel;
 	}
 	
 	public JComponent addControlPanel(boolean left, ControlPanel<T> controlPanel){
 		JPanel sidePanel = (JPanel) (left ? splitPane.getLeftComponent() : splitPane.getRightComponent());
-		sidePanel.add(controlPanel.getComponent(), BorderLayout.SOUTH);
+		sidePanel.add(controlPanel.getComponent());
 		views.add(controlPanel);
 		return sidePanel;
 	}
