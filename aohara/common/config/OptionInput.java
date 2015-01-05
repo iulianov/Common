@@ -18,14 +18,20 @@ import aohara.common.selectorPanel.DecoratedComponent;
 
 public abstract class OptionInput implements DecoratedComponent<JComponent> {
 	
+	private String displayName;
 	protected final Option option;
 	
 	public OptionInput(Option option){
 		this.option = option;
+		this.displayName = option.name;
+	}
+	
+	public void setDisplayName(String displayName){
+		this.displayName = displayName;
 	}
 	
 	public String getName(){
-		return option.name;
+		return displayName;
 	}
 	
 	public void apply() throws InvalidInputException{

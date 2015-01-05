@@ -17,7 +17,7 @@ public class ConfigBuilder {
 	private final Map<Option, OptionInput> options = new LinkedHashMap<>();
 	private final Map<Option, String> defaults = new LinkedHashMap<>();
 	
-	private void addProperty(Option option, OptionInput input, String defaultValue, boolean allowNone, Constraint... constraints){
+	private OptionInput addProperty(Option option, OptionInput input, String defaultValue, boolean allowNone, Constraint... constraints){
 		// Add Constraints
 		if (!allowNone){
 			option.addConstraint(new Constraints.NotNull(option));
@@ -28,11 +28,12 @@ public class ConfigBuilder {
 		
 		options.put(option, input);
 		defaults.put(option, defaultValue);
+		return input;
 	}
 	
-	public void addMultiProperty(String name, Collection<String> choices, String defaultValue, boolean allowNone, boolean hidden){
+	public OptionInput addMultiProperty(String name, Collection<String> choices, String defaultValue, boolean allowNone, boolean hidden){
 		Option option = new Option(name, hidden);
-		addProperty(
+		return addProperty(
 			option,
 			new OptionInput.ComboBoxInput(option, choices),
 			defaultValue,
@@ -40,8 +41,8 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addTrueFalseProperty(String name, Boolean defaultValue, boolean allowNone, boolean hidden){
-		addMultiProperty(
+	public OptionInput addTrueFalseProperty(String name, Boolean defaultValue, boolean allowNone, boolean hidden){
+		return addMultiProperty(
 			name,
 			Arrays.asList(new String[]{Boolean.TRUE.toString(), Boolean.FALSE.toString()}),
 			defaultValue != null ? defaultValue.toString() : null,
@@ -50,9 +51,9 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addPathProperty(String name, int fileSelectionMode, Path defaultPath, boolean allowNone, boolean hidden){
+	public OptionInput addPathProperty(String name, int fileSelectionMode, Path defaultPath, boolean allowNone, boolean hidden){
 		Option option = new Option(name, hidden);		
-		addProperty(
+		return addProperty(
 			option,
 			new OptionInput.FileChooserInput(option, fileSelectionMode),
 			defaultPath != null ? defaultPath.toString() : null,
@@ -60,9 +61,9 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone, boolean hidden){
+	public OptionInput addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone, boolean hidden){
 		Option option = new Option(name, hidden);
-		addProperty(
+		return addProperty(
 			option,
 			new OptionInput.TextFieldInput(option),
 			Integer.toString(defaultValue),
@@ -71,9 +72,9 @@ public class ConfigBuilder {
 		);
 	}
 	
-	public void addTextProperty(String name, String defaultValue, boolean allowNone, boolean hidden){
+	public OptionInput addTextProperty(String name, String defaultValue, boolean allowNone, boolean hidden){
 		Option option = new Option(name, hidden);
-		addProperty(option, new OptionInput.TextFieldInput(option), defaultValue, allowNone);
+		return addProperty(option, new OptionInput.TextFieldInput(option), defaultValue, allowNone);
 	}
 	
 	// --------------
