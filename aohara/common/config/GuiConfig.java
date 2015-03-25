@@ -14,12 +14,12 @@ public class GuiConfig extends Config{
 		inputs = options.values();
 	}
 	
-	public void openOptionsWindow(boolean restartOnSuccess, boolean exitOnCancel){
+	public void openOptionsWindow(boolean exitOnCancel){
 		for (OptionInput input : inputs){
 			input.update();
 		}
 		
-		new OptionsWindow(this, inputs, restartOnSuccess, exitOnCancel).toDialog();
+		new OptionsWindow(this, inputs, exitOnCancel).toDialog();
 	}
 
 }

@@ -20,17 +20,16 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 	private final JPanel panel = new JPanel();
 	private JDialog dialog;
 	private final Collection<OptionInput> optionInputs;
-	private final boolean restartOnSuccess, exitOnCancel;
+	private final boolean exitOnCancel;
 	private final Config config;
 	
 	public OptionsWindow(Config config, Collection<OptionInput> optionInputs){
-		this(config, optionInputs, false, false);
+		this(config, optionInputs, false);
 	}
 	
-	public OptionsWindow(Config config, Collection<OptionInput> optionInputs, boolean restartOnSuccess, boolean exitOnCancel){
+	public OptionsWindow(Config config, Collection<OptionInput> optionInputs, boolean exitOnCancel){
 		this.config = config;
 		this.optionInputs = optionInputs;
-		this.restartOnSuccess = restartOnSuccess;
 		this.exitOnCancel = exitOnCancel;
 		
 		panel.setLayout(new GridLayout(optionInputs.size() + 1, 2));
@@ -86,17 +85,6 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 				
 				if (dialog != null){
 					dialog.setVisible(false);
-					
-					// Restart if required
-					if (restartOnSuccess){
-						JOptionPane.showMessageDialog(
-							getComponent(),
-							"A restart is required",
-							"Restart",
-							JOptionPane.WARNING_MESSAGE
-						);
-						System.exit(0);
-					}
 				}
 				
 			} catch(InvalidInputException ex){
