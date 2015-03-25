@@ -10,6 +10,7 @@ import aohara.common.config.Config;
 import aohara.common.config.Constraint.InvalidInputException;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,7 +20,7 @@ public class JsonConfigLoader extends ConfigLoader {
 	
 	private static final String NAME = "name", DATA = "data", KEY = "key", VALUE = "value";
 	private final JsonParser parser = new JsonParser();
-	private final Gson gson = new Gson();
+	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	
 	public JsonConfigLoader(Path filePath){
 		super(filePath);
