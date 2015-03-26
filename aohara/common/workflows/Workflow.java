@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import aohara.common.Listenable;
+import aohara.common.workflows.Workflow.WorkflowTask.TaskCompleteEvent;
 
 /**
  * Queues Tasks for Asynchronous Execution at a later date.
@@ -19,7 +20,7 @@ import aohara.common.Listenable;
  * @author Andrew O'Hara
  *
  */
-public final class Workflow extends Listenable<TaskListener> implements Runnable {
+public final class Workflow implements Runnable {
 
 	public static enum Status {Ready, Running, Finished, Error};
 	
@@ -54,7 +55,11 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 				for (TaskListener l : getListeners()){
 					l.taskStarted(this, task, task.getTargetProgress());
 				}
-				keepGoing = task.call(this);
+				TaskCompleteEvent event = task.call();
+				if (!event.isTaskSuccessful()){
+					keepGoing = false;
+				}
+				
 				for (TaskListener l : getListeners()){
 					l.taskComplete(this, task, !tasks.isEmpty() && keepGoing);
 				}
@@ -100,21 +105,87 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 	 * 
 	 * @author Andrew O'Hara
 	 */
-	public static abstract class WorkflowTask {
+	public abstract class WorkflowTask {
 		
-		protected void progress(Workflow workflow, int increment){
-			workflow.notifyProgress(this, increment);
+		private final TaskCallback[] callbacks;
+		
+		public WorkflowTask(TaskCallback... callbacks){
+			this.callbacks = callbacks;
+		}
+		
+		protected void progress(int increment){
+			getWorkflow().notifyProgress(this, increment);
 		}
 		
 		public abstract int getTargetProgress() throws IOException;
 		public abstract String getTitle();
+		public abstract TaskCompleteEvent call() throws Exception;
 		
 		@Override
 		public String toString(){
 			return getTitle();
 		}
 		
-		public abstract boolean call(Workflow workflow) throws Exception;
+		public Workflow getWorkflow(){
+			return Workflow.this;
+		}
+		
+		public abstract class TaskEvent {
+			
+			private final String description;
+			private final Boolean isRunning, isSuccessful;
+			
+			private TaskEvent(String description, boolean isRunning, Boolean isSuccessful){
+				this.description = description;
+				this.isRunning = isRunning;
+				this.isSuccessful = isSuccessful;
+			}
+			
+			public WorkflowTask getTask(){
+				return WorkflowTask.this;
+			}
+			
+			public String getDescription(){
+				return String.format("Task: %s - %s", getTask().getTitle(), description);
+			}
+			
+			public boolean isTaskRunning(){
+				return isRunning;
+			}
+			
+			public Boolean isTaskSuccessful(){
+				return isSuccessful;
+			}
+			
+		}
+		
+		public class TaskStartedEvent extends TaskEvent {
+			
+			protected TaskStartedEvent(){
+				super("Started", true, null);
+			}
+		}
+		
+		public abstract class TaskCompleteEvent extends TaskEvent {
+			
+			private TaskCompleteEvent(String description, boolean isSuccessful){
+				super(description, false, isSuccessful);
+			}
+			
+		}
+		
+		public class TaskSuccessEvent extends TaskCompleteEvent {
+			
+			protected TaskSuccessEvent(){
+				super("Success", true);
+			}
+		}
+		
+		public class TaskFailureEvent extends TaskCompleteEvent {
+			
+			protected TaskFailureEvent(String reason){
+				super(String.format("Failure: %s", reason), false);
+			}
+		}
 	}
-
 }
