@@ -12,7 +12,11 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import aohara.common.selectorPanel.DecoratedComponent;
-import aohara.common.workflows.Workflow.WorkflowTask;
+import aohara.common.workflows.Workflow.Status;
+import aohara.common.workflows.tasks.TaskCallback;
+import aohara.common.workflows.tasks.WorkflowTask;
+import aohara.common.workflows.tasks.WorkflowTask.TaskEvent;
+import aohara.common.workflows.tasks.WorkflowTask.TaskExceptionEvent;
 
 /**
  * Panel that is used to display the progress of various {@link aohara.common.workflows.Workflow}s.
@@ -22,7 +26,7 @@ import aohara.common.workflows.Workflow.WorkflowTask;
  * 
  * @author Andrew O'Hara
  */
-public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
+public class ProgressPanel extends TaskCallback implements DecoratedComponent<JPanel>{
 	
 	private final JPanel panel = new JPanel();
 	private final HashMap<Workflow, JProgressBar> bars = new HashMap<>();
@@ -31,26 +35,43 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		panel.setPreferredSize(new Dimension(800, 30));
 	}
-
-	@Override
-	public void taskStarted(Workflow workflow, WorkflowTask task, int target) {
-		JProgressBar bar = new JProgressBar();
-		bar.setMaximum(target > 0 ? target : 0);
-		bar.setIndeterminate(target < 1);
-		bar.setStringPainted(true);
-		panel.add(bar);
-		bars.put(workflow, bar);
-
-		panel.setVisible(true);
-		panel.validate();
-		
-		taskProgress(workflow, task, 0);
-	}
 	
 	@Override
-	public void taskProgress(Workflow workflow, WorkflowTask task, int increment) {			
+	protected void processTaskEvent(TaskEvent event) {
+		switch(event.getTask().getStatus()){
+		case Ready:
+			break;  // Ignored
+		case Running:
+			taskProgress(event.getTask());
+			break;
+		case Exception:
+			taskError(event.getTask(), ((TaskExceptionEvent)event).exception);
+		case Success:
+		case Failure:
+			taskComplete(event.getTask());
+			break;
+		}
+	}
+	
+	public void taskProgress(WorkflowTask task){
+		Workflow workflow = task.getWorkflow();
+		
+		// Get Progress Bar
 		JProgressBar bar = bars.get(workflow);
-		bar.setValue(bar.getValue() + increment);
+		if (bar == null){
+			bar = new JProgressBar();
+			bar.setMaximum(task.getTargetProgress());  // Max set here, since setting in constructor may yield range exception
+			bar.setIndeterminate(task.getTargetProgress() < 1);
+			bar.setStringPainted(true);
+			bars.put(workflow, bar);
+			
+			panel.add(bar);
+			panel.setVisible(true);
+			panel.validate();
+		}
+		
+		// Set Progress
+		bar.setValue(task.getProgress());
 		if (bar.isIndeterminate()){
 			bar.setString(task.toString());
 		} else {
@@ -61,31 +82,31 @@ public class ProgressPanel implements DecoratedComponent<JPanel>, TaskListener{
 		}
 	}
 	
-	@Override
-	public void taskComplete(Workflow workflow, WorkflowTask task, boolean tasksRemaining){
-		JProgressBar bar = bars.remove(workflow);
+	public void taskComplete(WorkflowTask task){
+		JProgressBar bar = bars.remove(task.getWorkflow());
 		
+		// Hide Progress Panel if no more tasks in progress
 		// Should be done first for panel to notice change during component removal
-		if (!tasksRemaining && bars.isEmpty()){
+		boolean workflowComplete = task.getWorkflow().getStatus() != Status.Running;
+		if (workflowComplete && bars.isEmpty()){
 			panel.setVisible(false);
 		}
 		
+		// Remove Progress Bar from Panel of bars
 		if (bar != null){
 			panel.remove(bar);
 			panel.repaint();
 		}
 	}
 
-	@Override
-	public void taskError(Workflow workflow, WorkflowTask task, boolean tasksRemaining, Exception e) {
+	public void taskError(WorkflowTask task, Exception e) {
 		e.printStackTrace();
 		JOptionPane.showMessageDialog(
 			panel,
-			"An error ocurred while processing:\n" + workflow + "\n\n" + e,
+			"An error ocurred while processing:\n" + task.getWorkflow() + "\n\n" + e,
 			"Error!",
 			JOptionPane.ERROR_MESSAGE
 		);
-		taskComplete(workflow, task, tasksRemaining);
 	}
 
 	@Override

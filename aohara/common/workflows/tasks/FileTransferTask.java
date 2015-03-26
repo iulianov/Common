@@ -7,13 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FilenameUtils;
-
-import aohara.common.workflows.Workflow;
-import aohara.common.workflows.Workflow.WorkflowTask;
 
 /**
  * WorkflowTask to transfer the file from the given URL to the given path location.
@@ -27,12 +23,18 @@ public class FileTransferTask extends WorkflowTask {
 	private final Path dest;
 	
 	public FileTransferTask(URI src, Path dest){
+		super(String.format("Transferring to %s", dest));
 		this.src = src;
 		this.dest = dest;
 	}
 
 	@Override
-	public boolean call(Workflow workflow) throws IOException, URISyntaxException {
+	protected int findTargetProgress() throws IOException {
+		return src != null ? src.toURL().openConnection().getContentLength() : -1;
+	}
+
+	@Override
+	public boolean execute() throws Exception {
 		// Do not download if no input was specified
 		if (src  == null){
 			return true;
@@ -69,21 +71,11 @@ public class FileTransferTask extends WorkflowTask {
 				os.write(buf, 0, bytesRead);
 				currentBunch += bytesRead;
 				if (currentBunch / contentLength >= REPORT_PER_PERCENT){
-					progress(workflow, currentBunch);
+					progress(currentBunch);
 					currentBunch = 0;
 				}
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public String getTitle() {		
-		return String.format("Transferring to %s", dest);
-	}
-
-	@Override
-	public int getTargetProgress() throws IOException {
-		return src != null ? src.toURL().openConnection().getContentLength() : -1;
 	}
 }

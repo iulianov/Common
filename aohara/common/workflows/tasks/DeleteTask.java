@@ -7,9 +7,6 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 
-import aohara.common.workflows.Workflow;
-import aohara.common.workflows.Workflow.WorkflowTask;
-
 /**
  * WorkflowTask to delete the given file.
  * 
@@ -20,19 +17,8 @@ public class DeleteTask extends WorkflowTask {
 	private final Path path;
 
 	public DeleteTask(Path path) {
+		super(String.format("Deleting %s", path.toFile()));
 		this.path = path;
-	}
-
-	@Override
-	public boolean call(Workflow workflow) throws FileNotFoundException {
-		for (File file : getFiles(path.toFile())){
-			int size = (int) file.length();
-			if (file.exists() && !file.delete()) {
-				throw new FileNotFoundException("Failed to delete file: " + path.toFile());
-			}
-			progress(workflow, size);
-		}
-		return true;
 	}
 	
 	private List<File> getFiles(File file){
@@ -49,7 +35,7 @@ public class DeleteTask extends WorkflowTask {
 	}
 
 	@Override
-	public int getTargetProgress() throws IOException {
+	protected int findTargetProgress() throws IOException {
 		int progress = 0;
 		for (File file : getFiles(path.toFile())){
 			progress += file.length();
@@ -58,7 +44,14 @@ public class DeleteTask extends WorkflowTask {
 	}
 
 	@Override
-	public String getTitle() {
-		return String.format("Deleting %s", path.toFile());
+	public boolean execute() throws Exception {
+		for (File file : getFiles(path.toFile())){
+			int size = (int) file.length();
+			if (file.exists() && !file.delete()) {
+				throw new FileNotFoundException("Failed to delete file: " + path.toFile());
+			}
+			progress(size);
+		}
+		return true;
 	}
 }
