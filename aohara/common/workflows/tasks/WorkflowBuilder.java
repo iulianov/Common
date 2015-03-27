@@ -1,4 +1,4 @@
-package aohara.common.workflows;
+package aohara.common.workflows.tasks;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,11 +10,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 
-import aohara.common.workflows.tasks.BrowserGoToTask;
-import aohara.common.workflows.tasks.DeleteTask;
-import aohara.common.workflows.tasks.FileTransferTask;
-import aohara.common.workflows.tasks.TaskCallback;
-import aohara.common.workflows.tasks.WorkflowTask;
+import aohara.common.workflows.Workflow;
 
 /**
  * Class with methods for adding standard tasks to a Workflow

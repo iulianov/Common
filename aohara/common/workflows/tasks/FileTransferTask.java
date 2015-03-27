@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.file.Path;
 
@@ -23,7 +24,7 @@ public class FileTransferTask extends WorkflowTask {
 	private final Path dest;
 	
 	public FileTransferTask(URI src, Path dest){
-		super(String.format("Transferring to %s", dest));
+		super("Downloading File");
 		this.src = src;
 		this.dest = dest;
 	}
@@ -35,9 +36,14 @@ public class FileTransferTask extends WorkflowTask {
 
 	@Override
 	public boolean execute() throws Exception {
+		transfer(src, dest);
+		return true;
+	}
+	
+	protected void transfer(URI src, Path dest) throws MalformedURLException, IOException{
 		// Do not download if no input was specified
 		if (src  == null){
-			return true;
+			return;
 		}
 		
 		File destFile = dest.toFile();
@@ -76,6 +82,5 @@ public class FileTransferTask extends WorkflowTask {
 				}
 			}
 		}
-		return true;
 	}
 }

@@ -23,6 +23,7 @@ public abstract class WorkflowTask {
 	private Integer targetProgress;
 	private Status status = Status.Ready;
 	private Workflow workflow;
+	private Object result;
 	
 	public WorkflowTask(String title){
 		this.title = title != null ? title : "Unnamed Task";
@@ -62,7 +63,7 @@ public abstract class WorkflowTask {
 		try {
 			boolean success = execute();
 			status = success ? Status.Success : Status.Failure;
-			workflow.notify(new TaskEvent(status.toString()));
+			workflow.notify(new TaskEvent(status.toString(), result));
 			return success;
 		} catch (Exception e){
 			status = Status.Exception;
@@ -84,6 +85,10 @@ public abstract class WorkflowTask {
 		return workflow;
 	}
 	
+	protected void setResult(Object result){
+		this.result = result;
+	}
+	
 	public abstract boolean execute() throws Exception;
 	protected abstract int findTargetProgress() throws IOException;
 	
@@ -96,9 +101,15 @@ public abstract class WorkflowTask {
 	public class TaskEvent {
 		
 		public final String description;
-
+		public final Object data;
+		
 		private TaskEvent(String description){
+			this(description, null);
+		}
+		
+		private TaskEvent(String description, Object data){
 			this.description = description != null ? description : "";
+			this.data = data;
 		}
 		
 		public WorkflowTask getTask(){
