@@ -16,7 +16,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.sun.istack.internal.NotNull;
 
 public class JsonConfigLoader extends ConfigLoader {
 	
@@ -33,7 +32,6 @@ public class JsonConfigLoader extends ConfigLoader {
 		this.gson = gson;
 	}
 
-	@NotNull
 	@Override
 	public Map<String, String> loadProperties(Config config) {
 		Map<String, String> properties = new LinkedHashMap<>();
@@ -77,7 +75,6 @@ public class JsonConfigLoader extends ConfigLoader {
 		}
 	}
 	
-	@NotNull
 	private JsonArray loadConfigProperties(){
 		try (FileReader reader = new FileReader(filePath.toFile())){
 			return parser.parse(reader).getAsJsonArray();
