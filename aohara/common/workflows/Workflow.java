@@ -1,10 +1,12 @@
 package aohara.common.workflows;
 
-import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import aohara.common.Listenable;
+import aohara.common.workflows.tasks.TaskCallback;
+import aohara.common.workflows.tasks.WorkflowTask;
+import aohara.common.workflows.tasks.WorkflowTask.TaskEvent;
 
 /**
  * Queues Tasks for Asynchronous Execution at a later date.
@@ -19,26 +21,22 @@ import aohara.common.Listenable;
  * @author Andrew O'Hara
  *
  */
-public final class Workflow extends Listenable<TaskListener> implements Runnable {
+public final class Workflow implements Runnable {
 
-	public static enum Status {Ready, Running, Finished, Error};
+	public static enum Status {Ready, Running, Success, Failure, Exception};
 	
 	private final Queue<WorkflowTask> tasks = new LinkedList<>();
 	private final String name;
+	private final Collection<TaskCallback> callbacks;
+	private final int totalTasks;
 	
 	private Status status = Status.Ready;
-	private int totalTasks = 0;
 	
-	public Workflow(String name){
+	public Workflow(String name, Queue<WorkflowTask> tasks, Collection<TaskCallback> callbacks){
 		this.name = name;
-	}
-	
-	public void addTask(WorkflowTask task){
-		if (status != Status.Ready){
-			throw new IllegalArgumentException("Can only add tasks before workflow has started.");
-		}
-		tasks.add(task);
-		totalTasks++;
+		this.tasks.addAll(tasks);
+		this.callbacks = callbacks;
+		totalTasks = tasks.size();
 	}
 	
 	@Override
@@ -46,32 +44,20 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 		status = Status.Running;
 		
 		// Run Workflow
-		WorkflowTask task = null;
-		boolean keepGoing = true;
-		try {
-			while(!tasks.isEmpty() && keepGoing){
-				task = tasks.poll();
-				for (TaskListener l : getListeners()){
-					l.taskStarted(this, task, task.getTargetProgress());
-				}
-				keepGoing = task.call(this);
-				for (TaskListener l : getListeners()){
-					l.taskComplete(this, task, !tasks.isEmpty() && keepGoing);
-				}
+		while(!tasks.isEmpty()){
+			WorkflowTask task = tasks.poll();
+			if (!task.call(this)){
+				status = Status.Failure;
+				return;
 			}
-			status = Status.Finished;
 		}
-		catch (Exception e) { // Stop if exception occurs
-			for (TaskListener l : getListeners()){
-				l.taskError(this, task, false, e);
-			}
-			status = Status.Error;
-		}
+		
+		status = Status.Success;
 	}
 	
-	public void notifyProgress(WorkflowTask task, int increment){
-		for (TaskListener l : getListeners()){
-			l.taskProgress(this, task, increment);
+	public void notify(TaskEvent event){
+		for (TaskCallback callback : callbacks){
+			callback.handleTaskEvent(event);
 		}
 	}
 	
@@ -91,30 +77,4 @@ public final class Workflow extends Listenable<TaskListener> implements Runnable
 	public String toString(){
 		return name;
 	}
-	
-	/**
-	 * Abstract Base Class used to perform work for {@link aohara.common.workflows.Workflow}s.
-	 * 
-	 * The call() method is to return a boolean.  This boolean is used to decide
-	 * whether the {@link aohara.common.workflows.Workflow} will continue executing.
-	 * 
-	 * @author Andrew O'Hara
-	 */
-	public static abstract class WorkflowTask {
-		
-		protected void progress(Workflow workflow, int increment){
-			workflow.notifyProgress(this, increment);
-		}
-		
-		public abstract int getTargetProgress() throws IOException;
-		public abstract String getTitle();
-		
-		@Override
-		public String toString(){
-			return getTitle();
-		}
-		
-		public abstract boolean call(Workflow workflow) throws Exception;
-	}
-
 }

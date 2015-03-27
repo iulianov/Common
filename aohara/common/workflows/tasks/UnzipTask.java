@@ -11,8 +11,6 @@ import aohara.common.tree.TreeNode;
 import aohara.common.tree.zip.ZipFileNode;
 import aohara.common.workflows.ConflictResolver;
 import aohara.common.workflows.ConflictResolver.Resolution;
-import aohara.common.workflows.Workflow;
-import aohara.common.workflows.Workflow.WorkflowTask;
 
 /**
  * WorkflowTask to extract selected files from a Zip File.
@@ -27,6 +25,7 @@ public class UnzipTask extends WorkflowTask {
 	private final ConflictResolver cr;
 	
 	public UnzipTask(Path zipPath, Path destPath, TreeNode node, ConflictResolver cr){
+		super(String.format("Unzipping %s", node.getName()));
 		this.zipPath = zipPath;
 		this.destPath = destPath;
 		this.sourceNode = node;
@@ -35,33 +34,33 @@ public class UnzipTask extends WorkflowTask {
 	}
 	
 	@Override
-	public boolean call(Workflow workflow) throws IOException {
+	public boolean execute() throws Exception {
 		if (destPath.toFile().isFile() && destPath.toFile().exists()){
 			Resolution res = cr.getResolution(destPath);
 			if (res.equals(Resolution.Overwrite)){
 				FileUtils.deleteDirectory(destPath.toFile());
-				unzip(workflow);
+				unzip();
 			} else if (res.equals(Resolution.Skip)){
 				// Skip Module
 			} else {
 				throw new IllegalStateException("Uncaught Resolution");
 			}
 		} else {
-			unzip(workflow);
+			unzip();
 		}
 		
 		return true;
 	}
 	
-	private void unzip(Workflow workflow) throws IOException {
+	private void unzip() throws IOException {
 		try(ZipFile file = new ZipFile(zipPath.toFile())){
 			//TreeNode rootNode = sourceNode.getParent() != null ? sourceNode.getParent() : sourceNode;
 			//unzip(workflow, file, sourceNode, rootNode);
-			unzip(workflow, file, sourceNode);
+			unzip(file, sourceNode);
 			for (TreeNode child : sourceNode.getAllChildren()){
 				if (child instanceof ZipFileNode){
 					//unzip(workflow, file, (ZipFileNode) child, rootNode);
-					unzip(workflow, file, (ZipFileNode) child);
+					unzip(file, (ZipFileNode) child);
 				}
 				
 			}
@@ -69,19 +68,19 @@ public class UnzipTask extends WorkflowTask {
 	}
 	
 	//private void unzip(Workflow workflow, ZipFile file, TreeNode node, TreeNode rootNode) throws IOException{
-	private void unzip(Workflow workflow, ZipFile file, TreeNode node) throws IOException{
+	private void unzip(ZipFile file, TreeNode node) throws IOException{
 		if (node instanceof ZipFileNode){
 			ZipEntry entry = ((ZipFileNode)node).entry;
 			FileUtils.copyInputStreamToFile(
 				file.getInputStream(entry),
 				destPath.resolve(node.getPath()).toFile()
 			);
-			progress(workflow, (int) entry.getSize());
+			progress((int) entry.getSize());
 		}
 	}
 
 	@Override
-	public int getTargetProgress() throws IOException {
+	protected int findTargetProgress() throws IOException {
 		long size = 0;
 		for (TreeNode node : sourceNode.getAllChildren()){
 			if (node instanceof ZipFileNode){
@@ -90,10 +89,4 @@ public class UnzipTask extends WorkflowTask {
 		}
 		return (int) size;
 	}
-
-	@Override
-	public String getTitle() {
-		return String.format("Unzipping %s", sourceNode.getName());
-	}
-
 }

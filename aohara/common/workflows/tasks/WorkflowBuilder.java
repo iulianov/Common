@@ -1,18 +1,16 @@
-package aohara.common.workflows;
+package aohara.common.workflows.tasks;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.Executor;
 
-import aohara.common.workflows.Workflow.WorkflowTask;
-import aohara.common.workflows.tasks.BrowserGoToTask;
-import aohara.common.workflows.tasks.DeleteTask;
-import aohara.common.workflows.tasks.FileTransferTask;
+import aohara.common.workflows.Workflow;
 
 /**
  * Class with methods for adding standard tasks to a Workflow
@@ -20,8 +18,8 @@ import aohara.common.workflows.tasks.FileTransferTask;
 public class WorkflowBuilder {
 	
 	private final String workflowName;
-	private final List<WorkflowTask> tasks = new LinkedList<>();
-	private final List<TaskListener> listeners = new LinkedList<>();
+	private final Queue<WorkflowTask> tasks = new LinkedList<>();
+	private final Collection<TaskCallback> listeners = new LinkedList<>();
 	
 	public WorkflowBuilder(String workflowName){
 		this.workflowName = workflowName;
@@ -68,19 +66,12 @@ public class WorkflowBuilder {
 		tasks.add(task);
 	}
 	
-	public void addListener(TaskListener listener){
+	public void addListener(TaskCallback listener){
 		listeners.add(listener);
 	}
 	
 	public Workflow buildWorkflow(){
-		Workflow workflow = new Workflow(workflowName);
-		for (WorkflowTask task : tasks){
-			workflow.addTask(task);
-		}
-		for (TaskListener l : listeners){
-			workflow.addListener(l);
-		}
-		return workflow;
+		return new Workflow(workflowName, tasks, listeners);
 	}
 	
 	public void execute(Executor executor){

@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -39,7 +38,7 @@ import aohara.common.Listenable;
  * @param <T> The Type that is held in the JList.
  */
 @SuppressWarnings("serial")
-public class SelectorPanel<T> extends Listenable<ListListener<T>>
+public class SelectorPanel<T extends Comparable<T>> extends Listenable<ListListener<T>>
 		implements MouseListener, ListSelectionListener, SelectorInterface<T>,
 		DecoratedComponent<JComponent> {
 	
@@ -49,12 +48,12 @@ public class SelectorPanel<T> extends Listenable<ListListener<T>>
 	private JScrollPane scrollPane;
 	private JPopupMenu popupMenu;
 
-	public SelectorPanel(SelectorView<T, JPanel> view, Comparator<T> comparator, Dimension size, float splitRatio){
+	public SelectorPanel(SelectorView<T, JPanel> view, Dimension size, float splitRatio){
 		if (splitRatio < 0 || splitRatio > 1){
 			throw new IllegalArgumentException("splitRatio must be between (0,1)");
 		}
 		
-		list = new JList<T>(new SortedListModel<T>(comparator));
+		list = new JList<T>(new SortedListModel<T>());
 		
 		views.add(view);
 		
