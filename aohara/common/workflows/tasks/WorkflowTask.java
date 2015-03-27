@@ -33,7 +33,7 @@ public abstract class WorkflowTask {
 		
 		// If update percentage threshold has been achieved, notify callbacks of progress
 		float percentProgress = progress / (float) targetProgress;
-		if ((lastUpdatedAtPercent - percentProgress) > UPDATE_EVERY_PERCENT){
+		if ((percentProgress - lastUpdatedAtPercent) > UPDATE_EVERY_PERCENT){
 			lastUpdatedAtPercent = percentProgress;
 			workflow.notify(new TaskEvent("Progress"));
 		}
