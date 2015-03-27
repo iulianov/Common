@@ -2,7 +2,6 @@ package thirdParty;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -11,11 +10,11 @@ import java.util.TreeSet;
 import javax.swing.AbstractListModel;
 
 @SuppressWarnings("serial")
-public class SortedListModel<T> extends AbstractListModel<T> {
+public class SortedListModel<T extends Comparable<T>> extends AbstractListModel<T> {
 	SortedSet<T> model;
 
-	public SortedListModel(Comparator<T> comparator) {
-		model = new TreeSet<>(comparator);
+	public SortedListModel() {
+		model = new TreeSet<>();
 	}
 
 	public int getSize() {
