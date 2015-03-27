@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 
 import aohara.common.selectorPanel.DecoratedComponent;
-import aohara.common.workflows.Workflow.Status;
 import aohara.common.workflows.tasks.TaskCallback;
 import aohara.common.workflows.tasks.WorkflowTask;
 import aohara.common.workflows.tasks.WorkflowTask.TaskEvent;
@@ -48,7 +47,7 @@ public class ProgressPanel extends TaskCallback implements DecoratedComponent<JP
 			taskError(event.getTask(), ((TaskExceptionEvent)event).exception);
 		case Success:
 		case Failure:
-			taskComplete(event.getTask());
+			taskComplete(event.getTask(), event.isWorkflowComplete());
 			break;
 		}
 	}
@@ -82,12 +81,11 @@ public class ProgressPanel extends TaskCallback implements DecoratedComponent<JP
 		}
 	}
 	
-	public void taskComplete(WorkflowTask task){
+	public void taskComplete(WorkflowTask task, boolean workflowComplete){
 		JProgressBar bar = bars.remove(task.getWorkflow());
 		
 		// Hide Progress Panel if no more tasks in progress
 		// Should be done first for panel to notice change during component removal
-		boolean workflowComplete = task.getWorkflow().getStatus() != Status.Running;
 		if (workflowComplete && bars.isEmpty()){
 			panel.setVisible(false);
 		}

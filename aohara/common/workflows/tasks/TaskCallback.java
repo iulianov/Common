@@ -26,5 +26,15 @@ public abstract class TaskCallback {
 	}
 	
 	protected abstract void processTaskEvent(TaskEvent event);
-
+	
+	public static abstract class WorkflowCompleteCallback extends TaskCallback {
+		
+		@Override
+		public void handleTaskEvent(TaskEvent event){
+			if (event.getTask().getStatus() == Status.Success && event.isWorkflowComplete()){
+				processTaskEvent(event);
+			}
+		}
+		
+	}
 }

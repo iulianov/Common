@@ -109,6 +109,10 @@ public abstract class WorkflowTask {
 		public String toString(){
 			return String.format("Task: %s - %s", getTask().title, description);
 		}
+		
+		public boolean isWorkflowComplete(){
+			return workflow.getTotalTasks() == workflow.getProgress();
+		}
 	}
 	
 	public class TaskExceptionEvent extends TaskEvent {
