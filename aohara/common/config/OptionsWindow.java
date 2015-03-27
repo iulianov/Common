@@ -2,6 +2,7 @@ package aohara.common.config;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.Collection;
 
 import javax.swing.AbstractAction;
@@ -87,7 +88,7 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 					dialog.setVisible(false);
 				}
 				
-			} catch(InvalidInputException ex){
+			} catch(InvalidInputException | IOException ex){
 				config.rollback();  // Rollback changes to config
 				
 				JOptionPane.showMessageDialog(

@@ -46,7 +46,7 @@ public final class Workflow implements Runnable {
 		// Run Workflow
 		while(!tasks.isEmpty()){
 			WorkflowTask task = tasks.poll();
-			if (!task.call(this)){
+			if (task != null && !task.call(this)){
 				status = Status.Failure;
 				return;
 			}

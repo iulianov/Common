@@ -12,11 +12,11 @@ import java.util.List;
  * 
  * @author Andrew O'Hara
  */
-public class DeleteTask extends WorkflowTask {
+class DeleteTask extends WorkflowTask {
 
 	private final Path path;
 
-	public DeleteTask(Path path) {
+	DeleteTask(Path path) {
 		super(String.format("Deleting %s", path.toFile()));
 		this.path = path;
 	}

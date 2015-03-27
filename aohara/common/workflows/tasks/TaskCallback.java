@@ -11,11 +11,11 @@ public abstract class TaskCallback {
 	
 	private final Collection<Status> acceptedStatuses;
 	
-	public TaskCallback(){
+	protected TaskCallback(){
 		this(Status.values());
 	}
 	
-	public TaskCallback(Status... acceptedStatuses){
+	protected TaskCallback(Status... acceptedStatuses){
 		this.acceptedStatuses = Arrays.asList(acceptedStatuses);
 	}
 	

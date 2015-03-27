@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Executor;
 
+import aohara.common.tree.TreeNode;
+import aohara.common.workflows.ConflictResolver;
 import aohara.common.workflows.Workflow;
 
 /**
@@ -76,5 +78,9 @@ public class WorkflowBuilder {
 	
 	public void execute(Executor executor){
 		executor.execute(buildWorkflow());
+	}
+	
+	public void unzip(Path zipPath, Path destPath, TreeNode node, ConflictResolver cr){
+		addTask(new UnzipTask(zipPath, destPath, node, cr));
 	}
 }

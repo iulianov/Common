@@ -1,9 +1,11 @@
 package aohara.common.config;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.config.loader.ConfigLoader;
@@ -41,7 +43,7 @@ public class Config {
 		options.get(key).setValue(value);
 	}
 	
-	public void save(){
+	public void save() throws IOException{
 		loader.save(this);
 	}
 	
@@ -77,7 +79,13 @@ public class Config {
 	
 	private void ensureLoaded(){
 		if (!loaded){
-			loader.load(this);
+			try {
+				for (Entry<String, String> entry : loader.loadProperties(this).entrySet()){
+					setProperty(entry.getKey(), entry.getValue());
+				}
+			} catch (IOException | InvalidInputException e) {
+				e.printStackTrace();
+			}
 			loaded = true;
 		}
 	}

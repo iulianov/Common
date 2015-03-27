@@ -1,7 +1,9 @@
 package aohara.common.config.loader;
 
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 
 import aohara.common.config.Config;
 
@@ -13,6 +15,6 @@ public abstract class ConfigLoader {
 		this.filePath = filePath;
 	}
 	
-	public abstract void load(Config config);
-	public abstract void save(Config config);
+	public abstract Map<String, String> loadProperties(Config config) throws IOException;
+	public abstract void save(Config config) throws IOException;
 }

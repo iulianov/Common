@@ -23,7 +23,7 @@ public class FileTransferTask extends WorkflowTask {
 	private final URI src;
 	private final Path dest;
 	
-	public FileTransferTask(URI src, Path dest){
+	protected FileTransferTask(URI src, Path dest){
 		super("Downloading File");
 		this.src = src;
 		this.dest = dest;
@@ -61,7 +61,9 @@ public class FileTransferTask extends WorkflowTask {
 		} 
 		// Check for file conflict
 		else if (destFile.isFile() && destFile.exists()){
-			destFile.delete();
+			if (!destFile.delete()){
+				throw new IOException("File conflict.  Could not delete existing file.");
+			}
 		}
 		
 		// Perform Transfer

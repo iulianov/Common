@@ -17,14 +17,14 @@ import aohara.common.workflows.ConflictResolver.Resolution;
  * 
  * @author Andrew O'Hara
  */
-public class UnzipTask extends WorkflowTask {
+class UnzipTask extends WorkflowTask {
 	
 	private final Path zipPath;
 	private final Path destPath;
 	private final TreeNode sourceNode;
 	private final ConflictResolver cr;
 	
-	public UnzipTask(Path zipPath, Path destPath, TreeNode node, ConflictResolver cr){
+	UnzipTask(Path zipPath, Path destPath, TreeNode node, ConflictResolver cr){
 		super(String.format("Unzipping %s", node.getName()));
 		this.zipPath = zipPath;
 		this.destPath = destPath;
@@ -54,12 +54,9 @@ public class UnzipTask extends WorkflowTask {
 	
 	private void unzip() throws IOException {
 		try(ZipFile file = new ZipFile(zipPath.toFile())){
-			//TreeNode rootNode = sourceNode.getParent() != null ? sourceNode.getParent() : sourceNode;
-			//unzip(workflow, file, sourceNode, rootNode);
 			unzip(file, sourceNode);
 			for (TreeNode child : sourceNode.getAllChildren()){
 				if (child instanceof ZipFileNode){
-					//unzip(workflow, file, (ZipFileNode) child, rootNode);
 					unzip(file, (ZipFileNode) child);
 				}
 				

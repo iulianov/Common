@@ -9,9 +9,13 @@ public class BrowserGoToTask extends WorkflowTask {
 	
 	private final URL url;
 
-	public BrowserGoToTask(URL url) {
+	BrowserGoToTask(URL url) {
 		super("Directing Browser to " + url);
 		this.url = url;
+	}
+	
+	public static void callNow(URL url){
+		new BrowserGoToTask(url).call(null);
 	}
 
 	@Override
