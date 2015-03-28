@@ -59,14 +59,17 @@ public class ProgressPanel extends TaskCallback implements DecoratedComponent<JP
 		JProgressBar bar = bars.get(workflow);
 		if (bar == null){
 			bar = new JProgressBar();
-			bar.setMaximum(task.getTargetProgress());  // Max set here, since setting in constructor may yield range exception
-			bar.setIndeterminate(task.getTargetProgress() < 1);
+			bar.setIndeterminate(true);
 			bar.setStringPainted(true);
 			bars.put(workflow, bar);
 			
 			panel.add(bar);
 			panel.setVisible(true);
 			panel.validate();
+			
+			// Once target progress has been calculated, attempt to set determinate 
+			bar.setMaximum(task.getTargetProgress());  // Max set here, since setting in constructor may yield range exception
+			bar.setIndeterminate(task.getTargetProgress() < 1);
 		}
 		
 		// Set Progress
