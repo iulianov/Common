@@ -1,6 +1,7 @@
 package aohara.common.config;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import aohara.common.config.loader.ConfigLoader;
@@ -19,7 +20,14 @@ public class GuiConfig extends Config{
 			input.update();
 		}
 		
-		new OptionsWindow(this, inputs, exitOnCancel).toDialog();
+		Collection<OptionInput> nonHiddenInputs = new LinkedHashSet<>();
+		for (OptionInput input : inputs){
+			if (!input.option.hidden){
+				nonHiddenInputs.add(input);
+			}
+		}
+		
+		new OptionsWindow(this, nonHiddenInputs, exitOnCancel).toDialog();
 	}
 
 }
