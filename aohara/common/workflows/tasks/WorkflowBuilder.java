@@ -81,6 +81,6 @@ public class WorkflowBuilder {
 	}
 	
 	public void unzip(Path zipPath, Path destPath, TreeNode node, ConflictResolver cr){
-		addTask(new UnzipTask(zipPath, destPath, node, cr));
+		addTask(new UnzipTreeTask(zipPath, destPath, node, cr));
 	}
 }
