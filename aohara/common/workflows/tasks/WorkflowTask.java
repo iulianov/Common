@@ -32,6 +32,10 @@ public abstract class WorkflowTask {
 	protected void progress(int increment){
 		progress += increment;
 		
+		if (targetProgress == null){
+			return;
+		}
+		
 		// If update percentage threshold has been achieved, notify callbacks of progress
 		float percentProgress = progress / (float) targetProgress;
 		if ((percentProgress - lastUpdatedAtPercent) > UPDATE_EVERY_PERCENT){

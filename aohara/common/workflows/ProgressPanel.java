@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 import aohara.common.selectorPanel.DecoratedComponent;
 import aohara.common.workflows.tasks.TaskCallback;
@@ -52,12 +53,14 @@ public class ProgressPanel extends TaskCallback implements DecoratedComponent<JP
 		}
 	}
 	
-	public void taskProgress(WorkflowTask task){
+	public void taskProgress(final WorkflowTask task){
 		Workflow workflow = task.getWorkflow();
 		
 		// Get Progress Bar
-		JProgressBar bar = bars.get(workflow);
-		if (bar == null){
+		final JProgressBar bar;
+		if (bars.containsKey(workflow)){
+			bar = bars.get(workflow);
+		} else {
 			bar = new JProgressBar();
 			bar.setIndeterminate(true);
 			bar.setStringPainted(true);
@@ -67,9 +70,13 @@ public class ProgressPanel extends TaskCallback implements DecoratedComponent<JP
 			panel.setVisible(true);
 			panel.validate();
 			
-			// Once target progress has been calculated, attempt to set determinate 
-			bar.setMaximum(task.getTargetProgress());  // Max set here, since setting in constructor may yield range exception
-			bar.setIndeterminate(task.getTargetProgress() < 1);
+			// Launch thread to calculate target task progress, and update bar when ready
+			SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+        			bar.setMaximum(task.getTargetProgress());  // Max set here, since setting in constructor may yield range exception
+        			bar.setIndeterminate(task.getTargetProgress() < 1);
+                }
+            });
 		}
 		
 		// Set Progress
