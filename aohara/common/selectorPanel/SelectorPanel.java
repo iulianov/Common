@@ -96,19 +96,19 @@ public class SelectorPanel<T extends Comparable<T>> extends Listenable<ListListe
 		return (SortedListModel<T>) list.getModel();
 	}
 	
-	@Override
-	public void addElement(T element) {
-		getModel().add(element);
-	}
+	public void setData(final Collection<T> data){
+		SwingUtilities.invokeLater(new Runnable(){
 
-	@Override
-	public void removeElement(T element) {
-		getModel().removeElement(element);
-	}
-	
-	@Override
-	public void clear() {
-		getModel().clear();
+			@Override
+			public void run() {
+				SortedListModel<T> model = getModel();
+				model.clear();
+				for (T element : data){
+					model.add(element);
+				}
+			}
+			
+		});
 	}
 	
 	@Override
