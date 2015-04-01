@@ -8,12 +8,12 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 
-public class UnzipTask extends WorkflowTask {
+class UnzipTask extends WorkflowTask {
 	
 	private final Map<Path, ZipEntry> zipPaths;
 	private final Path zipFilePath, destFolder;
 
-	public UnzipTask(Map<Path, ZipEntry> zipPaths, Path zipFilePath, Path destFolder) {
+	UnzipTask(Map<Path, ZipEntry> zipPaths, Path zipFilePath, Path destFolder) {
 		super("Unzipping to " + destFolder);
 		this.zipPaths = zipPaths;
 		this.zipFilePath = zipFilePath;

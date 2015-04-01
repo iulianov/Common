@@ -7,11 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Executor;
+import java.util.zip.ZipEntry;
 
-import aohara.common.tree.TreeNode;
-import aohara.common.workflows.ConflictResolver;
 import aohara.common.workflows.Workflow;
 
 /**
@@ -80,7 +80,7 @@ public class WorkflowBuilder {
 		executor.execute(buildWorkflow());
 	}
 	
-	public void unzip(Path zipPath, Path destPath, TreeNode node, ConflictResolver cr){
-		addTask(new UnzipTreeTask(zipPath, destPath, node, cr));
+	public void unzip(Path zipPath, Map<Path, ZipEntry> zipEntries, Path destFolder){
+		addTask(new UnzipTask(zipEntries, zipPath, destFolder));
 	}
 }
