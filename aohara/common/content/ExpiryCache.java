@@ -1,14 +1,22 @@
-package aohara.common;
+package aohara.common.content;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleCache<K, V> {
+/**
+ * Cache where data has an expiry date.
+ * 
+ * @author Andrew O'Hara
+ *
+ * @param <K> type of Key
+ * @param <V> type of Value
+ */
+public class ExpiryCache<K, V> {
 	
 	private final Map<K, CacheEntry<V>> cache = new HashMap<>();
 	private final long entryValidityMs;
 	
-	public SimpleCache(long validForMs){
+	public ExpiryCache(long validForMs){
 		this.entryValidityMs = validForMs;
 	}
 	
