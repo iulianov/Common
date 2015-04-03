@@ -2,6 +2,7 @@ package aohara.common.selectorPanel;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -187,6 +188,10 @@ public class SelectorPanel<T extends Comparable<T>> extends Listenable<ListListe
 			 }
 		}
     }
+	
+	public void addSelectorKeyListener(KeyListener listener){
+		list.addKeyListener(listener);
+	}
 	
 	private void errorMessage(String message){
 		JOptionPane.showMessageDialog(
