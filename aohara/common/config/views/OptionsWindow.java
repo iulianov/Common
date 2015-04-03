@@ -1,5 +1,6 @@
-package aohara.common.config;
+package aohara.common.config.views;
 
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -10,28 +11,23 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import aohara.common.config.Config;
 import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
+import aohara.tinkertime.views.Dialogs;
 
 public class OptionsWindow implements DecoratedComponent<JPanel>{
 	
 	private final JPanel panel = new JPanel();
 	private JDialog dialog;
-	private final Collection<OptionInput> optionInputs;
-	private final boolean exitOnCancel;
 	private final Config config;
 	
-	public OptionsWindow(Config config, Collection<OptionInput> optionInputs){
-		this(config, optionInputs, false);
-	}
-	
-	public OptionsWindow(Config config, Collection<OptionInput> optionInputs, boolean exitOnCancel){
+	public OptionsWindow(Config config){
 		this.config = config;
-		this.optionInputs = optionInputs;
-		this.exitOnCancel = exitOnCancel;
+		
+		Collection<OptionInput> optionInputs = config.getInputs();
 		
 		panel.setLayout(new GridLayout(optionInputs.size() + 1, 2));
 		panel.setBorder(BorderFactory.createTitledBorder(config.getName()));
@@ -55,11 +51,12 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 		if (dialog == null || !dialog.isActive()){
 			dialog = new JDialog();
 			dialog.setTitle(config.getName());
-			dialog.setModal(true);
+			dialog.setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
 			dialog.add(getComponent());
 			
 			dialog.pack();
 			dialog.setLocationRelativeTo(null);
+			dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 			dialog.setVisible(true);
 		}
 
@@ -77,24 +74,19 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 		public void actionPerformed(ActionEvent ev) {			
 			try {				
 				// Apply Values
-				for (OptionInput input : optionInputs){
+				for (OptionInput input : config.getInputs()){
 					input.apply();
 				}
 				config.save();
 				
+				// Only close dialog if no errors occurred
 				if (dialog != null){
 					dialog.setVisible(false);
 				}
 				
 			} catch(InvalidInputException | IOException ex){
 				config.rollback();  // Rollback changes to config
-				
-				JOptionPane.showMessageDialog(
-					getComponent(),
-					ex.getMessage(),
-					"Error",
-					JOptionPane.ERROR_MESSAGE
-				);
+				Dialogs.errorDialog(getComponent(), ex);
 			}
 		}		
 	}
@@ -110,12 +102,6 @@ public class OptionsWindow implements DecoratedComponent<JPanel>{
 		public void actionPerformed(ActionEvent e) {
 			if (dialog != null){
 				dialog.setVisible(false);
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				
-				// Exit if Required
-				if (exitOnCancel){
-					System.exit(1);
-				}
 			}
 		}	
 	}

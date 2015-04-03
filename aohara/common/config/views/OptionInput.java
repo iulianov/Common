@@ -1,4 +1,4 @@
-package aohara.common.config;
+package aohara.common.config.views;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -13,13 +13,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import aohara.common.config.Option;
 import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
 
 public abstract class OptionInput implements DecoratedComponent<JComponent> {
 	
 	private String displayName;
-	protected final Option option;
+	public final Option option;
 	
 	public OptionInput(Option option){
 		this.option = option;
