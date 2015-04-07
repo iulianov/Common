@@ -1,4 +1,4 @@
-package aohara.common.test;
+package aohara.common;
 
 import java.net.URL;
 import java.nio.file.Paths;

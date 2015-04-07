@@ -1,4 +1,4 @@
-package aohara.common.test;
+package aohara.common;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,0 +1,31 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+	mavenCentral()
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}	
+	}
+	test {
+		java {
+			srcDir 'test'
+		}
+	}
+}
+
+compileJava {
+	sourceCompatibility = '1.7'
+	targetCompatibility = '1.7'
+}
+
+dependencies {
+	compile 'commons-io:commons-io:2.4'
+	compile 'com.google.code.gson:gson:2.3'
+	
+	 testCompile 'junit:junit:4.11'
+}
