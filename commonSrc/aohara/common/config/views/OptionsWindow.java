@@ -13,10 +13,10 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import aohara.common.Dialogs;
 import aohara.common.config.Config;
 import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.selectorPanel.DecoratedComponent;
-import aohara.tinkertime.views.Dialogs;
 
 public class OptionsWindow implements DecoratedComponent<JPanel>{
 	
