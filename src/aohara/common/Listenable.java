@@ -16,7 +16,7 @@ public abstract class Listenable<T> {
 	
 	private final LinkedList<T> listeners = new LinkedList<>();
 	
-	public void addSelectionListener(T listener){
+	public void addListener(T listener){
 		listeners.add(listener);
 	}
 	

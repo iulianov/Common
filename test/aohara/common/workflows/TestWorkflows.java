@@ -1,4 +1,4 @@
-package aohara.common.test;
+package aohara.common.workflows;
 
 import java.net.URL;
 import java.nio.file.Paths;
@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import aohara.common.workflows.ProgressPanel;
-import aohara.common.workflows.WorkflowBuilder;
+import aohara.common.workflows.tasks.WorkflowBuilder;
 
 public class TestWorkflows {
 	

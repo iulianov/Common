@@ -7,7 +7,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class ControlPanel<T> implements SelectorView<T, JPanel> {
+public class ControlPanel<T> implements SelectorView<T> {
 	
 	protected final JPanel panel;
 	protected T element;
