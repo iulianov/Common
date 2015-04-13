@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FilenameUtils;
@@ -40,10 +42,17 @@ public class FileTransferTask extends WorkflowTask {
 		return true;
 	}
 	
-	protected void transfer(URI src, Path dest) throws MalformedURLException, IOException{
+	protected void transfer(URL url, Path dest) throws NullSourceException, MalformedURLException, IOException, URISyntaxException {
+		if (url == null){
+			throw new NullSourceException();
+		}
+		transfer(url.toURI(), dest);
+	}
+	
+	protected void transfer(URI src, Path dest) throws MalformedURLException, IOException, NullSourceException {
 		// Do not download if no input was specified
 		if (src  == null){
-			return;
+			throw new NullSourceException();
 		}
 		
 		File destFile = dest.toFile();
@@ -85,4 +94,6 @@ public class FileTransferTask extends WorkflowTask {
 			}
 		}
 	}
+	
+	protected static class NullSourceException extends Exception {} 
 }
