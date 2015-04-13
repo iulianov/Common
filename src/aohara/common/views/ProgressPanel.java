@@ -1,4 +1,4 @@
-package aohara.common.workflows;
+package aohara.common.views;
 
 import java.awt.Dimension;
 import java.awt.event.ContainerEvent;
@@ -13,6 +13,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import aohara.common.selectorPanel.DecoratedComponent;
+import aohara.common.workflows.Workflow;
 import aohara.common.workflows.tasks.TaskCallback;
 import aohara.common.workflows.tasks.WorkflowTask;
 import aohara.common.workflows.tasks.WorkflowTask.TaskEvent;
@@ -87,7 +88,8 @@ public class ProgressPanel extends TaskCallback implements DecoratedComponent<JP
 			bar.setString(String.format(
 				"(%d/%d) %s - %.2f%%",
 				workflow.getProgress(), workflow.getTotalTasks(), workflow,
-				(bar.getValue() / (float) bar.getMaximum()) * 100));
+				bar.getPercentComplete() * 100
+			));
 		}
 	}
 	
