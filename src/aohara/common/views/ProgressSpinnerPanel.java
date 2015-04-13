@@ -30,6 +30,7 @@ public class ProgressSpinnerPanel extends JPanel {
 		};
 		bar.setUI(new CircularProgressBarUI());
 		bar.setStringPainted(true);
+		bar.setBorderPainted(false);
 
 		return new ProgressSpinnerPanel(bar);
 	}
