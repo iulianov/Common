@@ -19,12 +19,12 @@ import aohara.common.workflows.Workflow;
  */
 public class WorkflowBuilder {
 	
-	private final String workflowName;
+	private final Object context;
 	private final Queue<WorkflowTask> tasks = new LinkedList<>();
 	private final Collection<TaskCallback> listeners = new LinkedList<>();
 	
-	public WorkflowBuilder(String workflowName){
-		this.workflowName = workflowName;
+	public WorkflowBuilder(Object context){
+		this.context = context;
 	}
 	
 	public void copy(Path src, Path dest) {
@@ -73,7 +73,7 @@ public class WorkflowBuilder {
 	}
 	
 	public Workflow buildWorkflow(){
-		return new Workflow(workflowName, tasks, listeners);
+		return new Workflow(context, tasks, listeners);
 	}
 	
 	public void execute(Executor executor){

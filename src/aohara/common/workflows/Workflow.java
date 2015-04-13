@@ -26,14 +26,14 @@ public final class Workflow implements Runnable {
 	public static enum Status {Ready, Running, Success, Failure, Exception};
 	
 	private final Queue<WorkflowTask> tasks = new LinkedList<>();
-	private final String name;
+	public final Object context;
 	private final Collection<TaskCallback> callbacks;
 	private final int totalTasks;
 	
 	private Status status = Status.Ready;
 	
-	public Workflow(String name, Queue<WorkflowTask> tasks, Collection<TaskCallback> callbacks){
-		this.name = name;
+	public Workflow(Object context, Queue<WorkflowTask> tasks, Collection<TaskCallback> callbacks){
+		this.context = context;
 		this.tasks.addAll(tasks);
 		this.callbacks = callbacks;
 		totalTasks = tasks.size();
@@ -75,6 +75,6 @@ public final class Workflow implements Runnable {
 	
 	@Override
 	public String toString(){
-		return name;
+		return String.format("%s workflow", context);
 	}
 }
