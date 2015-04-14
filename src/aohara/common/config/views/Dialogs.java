@@ -1,4 +1,4 @@
-package aohara.common;
+package aohara.common.config.views;
 
 import java.awt.Component;
 
