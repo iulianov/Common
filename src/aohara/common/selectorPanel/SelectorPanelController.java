@@ -70,7 +70,7 @@ public class SelectorPanelController<T extends Comparable<T>> implements Decorat
 		return list.getSelectedValue();
 	}
 
-	public void setData(Collection<T> data) {
+	public void setData(final Collection<T> data) {
 		SwingUtilities.invokeLater(new Runnable(){
 			@Override
 			public void run() {
