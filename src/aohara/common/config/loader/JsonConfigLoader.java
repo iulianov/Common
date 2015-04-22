@@ -59,7 +59,7 @@ public class JsonConfigLoader extends ConfigLoader {
 		for (String key : config.keySet()){
 			JsonObject pair = new JsonObject();
 			pair.addProperty(KEY, key);
-			pair.addProperty(VALUE, config.getProperty(key));
+			pair.addProperty(VALUE, config.getProperty(key).getValueAsString());
 			properties.add(pair);
 		}
 		

@@ -2,23 +2,23 @@ package aohara.common.config;
 
 public abstract class Constraint {
 	
-	public final String name;
+	private final String propertyName;
 	
-	public Constraint(Option option){
-		this.name = option.name;
+	public Constraint(String propertyName){
+		this.propertyName = propertyName;
 	}
 	
-	public abstract void check(String value) throws InvalidInputException;
+	public abstract void check(Object value) throws InvalidInputException;
 	
 	@SuppressWarnings("serial")
-	public static class InvalidInputException extends Exception {
+	public class InvalidInputException extends Exception {
 		
 		public InvalidInputException(Exception ex){
 			super(ex);
 		}
 		
 		public InvalidInputException(String message){
-			super(message);
+			super(String.format("Property %s: %s", propertyName, message));
 		}
 		
 	}
