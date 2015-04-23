@@ -1,4 +1,4 @@
-package aohara.common.config.views;
+package aohara.common.views;
 
 import java.awt.Component;
 
@@ -9,8 +9,8 @@ public class Dialogs {
 	public static void errorDialog(Component component, Throwable exception){
 		JOptionPane.showMessageDialog(
 			component,
-			exception.getClass().getSimpleName(),
 			exception.getMessage(),
+			exception.getClass().getSimpleName(),
 			JOptionPane.ERROR_MESSAGE
 		);
 	}

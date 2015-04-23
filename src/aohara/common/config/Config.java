@@ -5,13 +5,12 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.config.loader.ConfigLoader;
-import aohara.common.config.views.OptionInput;
-import aohara.common.config.views.OptionsWindow;
 
 /**
  * Abstract Configuration Manager which stores data in a properties file.
@@ -20,17 +19,17 @@ import aohara.common.config.views.OptionsWindow;
  */
 public class Config {
 	
-	private final Map<String, OptionInput> options = new LinkedHashMap<>();
+	private final Map<String, EditableProperty> options = new LinkedHashMap<>();
 	private final String name;
 	private final ConfigLoader loader;
 	private boolean loaded = false;
 	
-	Config(String name, ConfigLoader loader, Collection<OptionInput> optionInputs){
+	Config(String name, ConfigLoader loader, Collection<EditableProperty> options){
 		this.name = name;
 		this.loader = loader;
 		
-		for (OptionInput input : optionInputs){
-			options.put(input.option.name, input);
+		for (EditableProperty option : options){
+			this.options.put(option.name, option);
 		}
 	}
 	
@@ -42,8 +41,8 @@ public class Config {
 		return loader.filePath.getParent();
 	}
 	
-	public void setProperty(String key, String value) throws InvalidInputException{
-		options.get(key).option.setValue(value);
+	public void setProperty(String key, Object value) throws InvalidInputException{
+		options.get(key).setValue(value);
 	}
 	
 	public void save() throws IOException{
@@ -56,28 +55,36 @@ public class Config {
 	
 	public boolean isPropertySet(String key){
 		ensureLoaded();
-		return options.get(key).option.getValue() != null;
+		return options.get(key).getValue() != null;
 	}
 	
-	public String getProperty(String key){
+	public Property getProperty(String key){
 		ensureLoaded();
 		
-		OptionInput input = options.get(key);
-		Option option = input.option;
+		EditableProperty prop = options.get(key);
 		
 		try {
-			option.testValue(option.getValue());
-			return option.getValue();
+			prop.test();
+			return prop;
 		} catch (InvalidInputException ex){
-			new OptionsWindow(this).toDialog();
-			try {
-				option.testValue(option.getValue());
-				return option.getValue();
-			} catch (InvalidInputException e) {
+			OptionsWindow window = new OptionsWindow(this);
+			if (window.toDialog()){
+				return getProperty(key);
+			} else {
 				System.exit(1);
 				return null;
 			}
 		}
+	}
+	
+	public List<Property> getNonHiddenProperties(){
+		List<Property> nonHidden = new LinkedList<>();
+		for (EditableProperty prop : options.values()){
+			if (!prop.hidden){
+				nonHidden.add(prop);
+			}
+		}
+		return nonHidden;
 	}
 
 	public boolean hasProperty(String key){
@@ -88,21 +95,18 @@ public class Config {
 		return options.keySet();
 	}
 	
-	public Collection<OptionInput> getInputs(){
-		Collection<OptionInput> inputs = new LinkedList<>();
-		for (OptionInput input : options.values()){
-			if (!input.option.hidden){
-				inputs.add(input);
-			}
-		}
-		return inputs;
-	}
-	
 	private void ensureLoaded(){
 		if (!loaded){
 			try {
 				for (Entry<String, String> entry : loader.loadProperties(this).entrySet()){
-					setProperty(entry.getKey(), entry.getValue());
+					Class<?> type = options.get(entry.getKey()).type;
+					Object value = entry.getValue();
+					if (type.isAssignableFrom(java.io.File.class)){
+						value = new java.io.File(value.toString());
+					} else if (type.isAssignableFrom(Boolean.class)){
+						value = Boolean.parseBoolean(value.toString());
+					}
+					setProperty(entry.getKey(), value);
 				}
 			} catch (IOException | InvalidInputException e) {
 				e.printStackTrace();

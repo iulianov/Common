@@ -1,79 +1,45 @@
 package aohara.common.config;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import aohara.common.config.Constraint.InvalidInputException;
 import aohara.common.config.loader.ConfigLoader;
 import aohara.common.config.loader.JsonConfigLoader;
-import aohara.common.config.views.OptionInput;
 
 public class ConfigBuilder {
 	
-	private final Collection<OptionInput> inputs = new LinkedList<>();
-	private final Map<Option, String> defaults = new LinkedHashMap<>();
+	private final Map<EditableProperty, Object> defaults = new LinkedHashMap<>();
 	
-	private OptionInput addProperty(OptionInput input, String defaultValue, boolean allowNone, Constraint... constraints){
+	private void addProperty(EditableProperty prop, Object defaultValue, boolean allowNone){
 		// Add Constraints
 		if (!allowNone){
-			input.option.addConstraint(new Constraints.NotNull(input.option));
-		}
-		for (Constraint c : constraints){
-			input.option.addConstraint(c);
-		}
-		
-		inputs.add(input);
-		defaults.put(input.option, defaultValue);
-		return input;
+			prop.addConstraint(new Constraints.NotNull(prop.name));
+		}		
+		defaults.put(prop, defaultValue);
 	}
 	
-	public OptionInput addMultiProperty(String name, Collection<String> choices, String defaultValue, boolean allowNone, boolean hidden){
-		Option option = new Option(name, hidden);
-		return addProperty(
-			new OptionInput.ComboBoxInput(option, choices),
-			defaultValue,
-			allowNone
-		);
+	public void addBooleanProperty(String name, Boolean defaultValue, boolean allowNone, boolean hidden){
+		addProperty(new EditableProperty(name, hidden, Boolean.class), defaultValue, allowNone);
 	}
 	
-	public OptionInput addTrueFalseProperty(String name, Boolean defaultValue, boolean allowNone, boolean hidden){
-		return addMultiProperty(
-			name,
-			Arrays.asList(new String[]{Boolean.TRUE.toString(), Boolean.FALSE.toString()}),
-			defaultValue != null ? defaultValue.toString() : null,
-			allowNone,
-			hidden
-		);
+	public void addPathProperty(String name, int fileSelectionMode, File defaultFile, boolean allowNone, boolean hidden){
+		EditableProperty prop = new EditableProperty(name, hidden, File.class);
+		addProperty(prop, defaultFile, allowNone);
+		prop.addConstraint(new Constraints.EnsureIsFile(prop.name, fileSelectionMode));
 	}
 	
-	public OptionInput addPathProperty(String name, int fileSelectionMode, Path defaultPath, boolean allowNone, boolean hidden){
-		Option option = new Option(name, hidden);		
-		return addProperty(
-			new OptionInput.FileChooserInput(option, fileSelectionMode),
-			defaultPath != null ? defaultPath.toString() : null,
-			allowNone
-		);
+	public void addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone, boolean hidden){
+		EditableProperty prop = new EditableProperty(name, hidden, Integer.class);
+		addProperty(prop, defaultValue, allowNone);
+		prop.addConstraint(new Constraints.EnsureInt(prop.name, minValue, maxValue));
 	}
 	
-	public OptionInput addIntProperty(String name, Integer defaultValue, Integer minValue, Integer maxValue, boolean allowNone, boolean hidden){
-		Option option = new Option(name, hidden);
-		return addProperty(
-			new OptionInput.TextFieldInput(option),
-			Integer.toString(defaultValue),
-			allowNone,
-			new Constraints.EnsureInt(option, minValue, maxValue)
-		);
-	}
-	
-	public OptionInput addTextProperty(String name, String defaultValue, boolean allowNone, boolean hidden){
-		Option option = new Option(name, hidden);
-		return addProperty(new OptionInput.TextFieldInput(option), defaultValue, allowNone);
+	public void addStringProperty(String name, String defaultValue, boolean allowNone, boolean hidden){
+		addProperty(new EditableProperty(name, hidden, String.class), defaultValue, allowNone);
 	}
 	
 	// --------------
@@ -81,7 +47,7 @@ public class ConfigBuilder {
 	// --------------
 	
 	public Config createConfig(String name, Path filePath){
-		Config config = new Config(name, createLoader(filePath), inputs);
+		Config config = new Config(name, createLoader(filePath), defaults.keySet());
 		setDefaults(config);
 		return config;
 	}
@@ -89,10 +55,7 @@ public class ConfigBuilder {
 	public Config createConfigInDocuments(String name, String folderName, String fileName){
 		return createConfig(
 			name,
-			Paths.get(
-				System.getProperty("user.home"), "Documents",
-				folderName, fileName
-			)
+			Paths.get(System.getProperty("user.home"), "Documents", folderName, fileName)
 		);
 	}
 	
@@ -105,13 +68,12 @@ public class ConfigBuilder {
 	}
 	
 	private void setDefaults(Config config){
-		for (Entry<Option, String> entry : defaults.entrySet()){
-			Option option = entry.getKey();
-			String value = entry.getValue();
+		for (EditableProperty prop : defaults.keySet()){
+			Object value = defaults.get(prop);
 			
-			if (value != null && !config.isPropertySet(option.name)){
+			if (value != null && !config.isPropertySet(prop.name)){
 				try {
-					option.setValue(value);
+					prop.setValue(value);
 				} catch (InvalidInputException e) {
 					throw new RuntimeException(e);
 				}

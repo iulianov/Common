@@ -1,59 +1,21 @@
 package aohara.common.config;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
+
+import javax.swing.JFileChooser;
 
 public class Constraints {
 	
-	public static class MinLength extends NotNull {
-		
-		private final int length;
-		
-		public MinLength(Option option, int length){
-			super(option);
-			this.length = length;
-		}
-
-		@Override
-		public void check(String value) throws InvalidInputException {			
-			if (value.length() < length){
-				throw new InvalidInputException(
-					String.format(
-						"%s must be of minimum length %d.  Was %d",
-						name, length, value.length()
-					)
-				);
-			}
-		}
-	}
-	
 	public static class NotNull extends Constraint {
 
-		public NotNull(Option option) {
-			super(option);
+		public NotNull(String propertyName) {
+			super(propertyName);
 		}
 
 		@Override
-		public void check(String value) throws InvalidInputException {
+		public void check(Object value) throws InvalidInputException {
 			if (value == null || value.toString().isEmpty()){
-				throw new InvalidInputException(name + " must be non-null");
-			}
-		}
-	}
-	
-	public static class EnsureFloat extends Constraint {
-
-		public EnsureFloat(Option option) {
-			super(option);
-		}
-
-		@Override
-		public void check(String value) throws InvalidInputException {
-			try{
-				Float.parseFloat(value);
-			} catch(NumberFormatException ex){
-				throw new InvalidInputException(ex);
+				throw new InvalidInputException("must be non-null");
 			}
 		}
 	}
@@ -62,16 +24,16 @@ public class Constraints {
 		
 		private final Integer min, max;
 
-		public EnsureInt(Option option, Integer min, Integer max) {
-			super(option);
+		public EnsureInt(String propertyName, Integer min, Integer max) {
+			super(propertyName);
 			this.min = min != null ? min : Integer.MIN_VALUE;
 			this.max = max != null ? max : Integer.MAX_VALUE;
 		}
 
 		@Override
-		public void check(String value) throws InvalidInputException {
+		public void check(Object value) throws InvalidInputException {
 			try{
-				int val = Integer.parseInt(value);
+				int val = Integer.parseInt(value.toString());
 				if (val < min || val > max){
 					throw new InvalidInputException(String.format("%d is not in range (%d, %d)", val, min, max));
 				}
@@ -81,41 +43,24 @@ public class Constraints {
 		}
 	}
 	
-	public static class EnsurePathExists extends Constraint {
-		
-		private final boolean mustExist;
+	public static class EnsureIsFile extends Constraint {
 
-		public EnsurePathExists(Option option, boolean mustExist) {
-			super(option);
-			this.mustExist = mustExist;
+		public final int fileSelectionMode;
+		
+		public EnsureIsFile(String propertyName, int fileSelectionMode) {
+			super(propertyName);
+			this.fileSelectionMode = fileSelectionMode;
 		}
 
 		@Override
-		public void check(String value) throws InvalidInputException {
-			File file = new File(value);
-			if (!file.isFile() && !file.isDirectory()){
-				throw new InvalidInputException(file + " must be a valid path.");
-			} else if (mustExist && !file.exists()){
-				throw new InvalidInputException(file + " must exist");
-			}
-		}
-		
-	}
-	
-	public static class EnsureURL extends Constraint {
-
-		public EnsureURL(Option option) {
-			super(option);
-		}
-
-		@Override
-		public void check(String value) throws InvalidInputException {
-			try {
-				new URL(value);
-			} catch (MalformedURLException e) {
-				throw new InvalidInputException(e);
+		public void check(Object value) throws InvalidInputException {
+			if (!(value instanceof File)){
+				throw new InvalidInputException(value + " must be a file");
+			} else if (fileSelectionMode == JFileChooser.FILES_ONLY && !((File)value).isFile()){
+				throw new InvalidInputException(value + " must be a file");
+			} else if (fileSelectionMode == JFileChooser.DIRECTORIES_ONLY && !((File)value).isDirectory()){
+				throw new InvalidInputException(value + " must be a directory");
 			}
 		}
 	}
-
 }
