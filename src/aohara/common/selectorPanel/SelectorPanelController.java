@@ -1,8 +1,8 @@
 package aohara.common.selectorPanel;
 
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Collection;
 
 import javax.swing.JList;
@@ -89,28 +89,13 @@ public class SelectorPanelController<T extends Comparable<T>> implements Decorat
 		return splitPane;
 	}
 	
-	// -- Internal Components -----------------------------------------
-	
-	/*
-	private class SelectorSplitPane extends JSplitPane {
-		
-		public SelectorSplitPane(){
-			setContinuousLayout(true);
-		}
-		
-		@Override
-		public void paintComponent(java.awt.Graphics g){
-			// Overridden to prevent view update during model update
-			synchronized(selectorList){
-				super.paintComponent(g);
-			}
-		}
+	public JList<T> getList(){
+		return list;
 	}
-	*/
 	
 	// -- Listeners --------------------------------------------------
 	
-	private class InnerListener implements ListSelectionListener, MouseListener {
+	private class InnerListener extends MouseAdapter implements ListSelectionListener {
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
@@ -127,17 +112,6 @@ public class SelectorPanelController<T extends Comparable<T>> implements Decorat
 					view.display(element);
 					view.getComponent().updateUI();
 				}
-				
-				/*
-				// Reset right scroll bar to top
-				SwingUtilities.invokeLater(new Runnable(){
-					@Override
-					public void run() {
-						JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-						scrollBar.setValue(scrollBar.getMinimum());
-					}
-				});
-				*/
 			}
 		}
 		
@@ -156,14 +130,5 @@ public class SelectorPanelController<T extends Comparable<T>> implements Decorat
 				 }
 			}
 	    }
-		
-		@Override
-		public void mousePressed(MouseEvent e) { /* N/A */}
-		@Override
-		public void mouseReleased(MouseEvent e) { /* N/A */ }
-		@Override
-		public void mouseEntered(MouseEvent e) { /* N/A */ }
-		@Override
-		public void mouseExited(MouseEvent e) { /* N/A */ }
 	}
 }
