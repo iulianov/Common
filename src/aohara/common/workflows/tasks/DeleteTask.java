@@ -17,7 +17,7 @@ class DeleteTask extends WorkflowTask {
 	private final Path path;
 
 	DeleteTask(Path path) {
-		super(String.format("Deleting %s", path.toFile()));
+		super(String.format("Deleting %s", path));
 		this.path = path;
 	}
 	
@@ -37,20 +37,24 @@ class DeleteTask extends WorkflowTask {
 	@Override
 	protected int findTargetProgress() throws IOException {
 		int progress = 0;
-		for (File file : getFiles(path.toFile())){
-			progress += file.length();
+		if (path != null){
+			for (File file : getFiles(path.toFile())){
+				progress += file.length();
+			}
 		}
 		return progress;
 	}
 
 	@Override
 	public boolean execute() throws Exception {
-		for (File file : getFiles(path.toFile())){
-			int size = (int) file.length();
-			if (file.exists() && !file.delete()) {
-				throw new FileNotFoundException("Failed to delete file: " + path.toFile());
+		if (path != null){
+			for (File file : getFiles(path.toFile())){
+				int size = (int) file.length();
+				if (file.exists() && !file.delete()) {
+					throw new FileNotFoundException("Failed to delete file: " + path.toFile());
+				}
+				progress(size);
 			}
-			progress(size);
 		}
 		return true;
 	}
