@@ -19,16 +19,12 @@ import aohara.common.workflows.Workflow;
  */
 public class WorkflowBuilder {
 	
-	private Object context;
+	protected final Object context;
 	private final Queue<WorkflowTask> tasks = new LinkedList<>();
 	private final Collection<TaskCallback> listeners = new LinkedList<>();
 	
 	public WorkflowBuilder(Object context){
 		this.context = context;
-	}
-	
-	public void updateContext(Object newContext){
-		this.context = newContext;
 	}
 	
 	public void copy(Path src, Path dest) {
