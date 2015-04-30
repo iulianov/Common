@@ -18,26 +18,7 @@ public class VersionParser {
 		
 		Matcher m = VERSION_PATTERN.matcher(string);
 		if (m.find()){
-			// Split numbers
-			String group = m.group().replace("-", ".");
-			List<String> numbers = new ArrayList<>(Arrays.asList(group.split("\\.")));
-			
-			// If less than 3 numbers, add a third
-			if (numbers.size() < MAX_PERIODS + 1){
-				numbers.add("0");
-			}
-			
-			// Join numbers back into a version string
-			StringBuilder builder = new StringBuilder();
-			for (int i=0; i<numbers.size(); i++){
-				builder.append(numbers.get(i));
-				if (i < MAX_PERIODS){
-					builder.append(".");
-				}
-				
-			}
-
-			return builder.toString();
+			return m.group().replace("-", ".");
 		}
 		return null;
 	}
